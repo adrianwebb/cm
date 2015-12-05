@@ -26,13 +26,18 @@ class PlanAction < Nucleon.plugin_class(:nucleon, :cm_action)
   end
 
   #-----------------------------------------------------------------------------
-  # Settings
+  # Properties
+
+  def plan
+    @plan
+  end
 
   #-----------------------------------------------------------------------------
   # Operations
 
   def execute(&block)
     super do
+      initialize_plan
       block.call
     end
   end
@@ -40,6 +45,9 @@ class PlanAction < Nucleon.plugin_class(:nucleon, :cm_action)
   #-----------------------------------------------------------------------------
   # Utilities
 
+  def initialize_plan
+
+  end
 end
 end
 end
