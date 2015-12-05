@@ -5,7 +5,7 @@ nucleon_require(File.dirname(__FILE__), :cm_action)
 
 module Nucleon
 module Plugin
-class PlanAction < Plugin::CmAction
+class PlanAction < Nucleon.plugin_class(:nucleon, :cm_action)
 
   #-----------------------------------------------------------------------------
   # Constuctor / Destructor
