@@ -3,6 +3,8 @@ module Nucleon
 module Plugin
 class CmAction < Nucleon.plugin_class(:nucleon, :action)
 
+  include Mixin::Action::Config
+
   #-----------------------------------------------------------------------------
   # Constuctor / Destructor
 
@@ -23,6 +25,7 @@ class CmAction < Nucleon.plugin_class(:nucleon, :action)
 
   def configure
     super do
+      config_config
       yield if block_given?
     end
   end
@@ -32,12 +35,6 @@ class CmAction < Nucleon.plugin_class(:nucleon, :action)
 
   #-----------------------------------------------------------------------------
   # Operations
-
-  def validate(node = nil, network = nil)
-    super(node, network)
-  end
-
-  #---
 
   def execute(&block)
     super(false, false) do
