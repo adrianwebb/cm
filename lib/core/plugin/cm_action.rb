@@ -3,6 +3,7 @@ module Nucleon
 module Plugin
 class CmAction < Nucleon.plugin_class(:nucleon, :action)
 
+  include Parallel
   include Mixin::Action::Config
 
   #-----------------------------------------------------------------------------
