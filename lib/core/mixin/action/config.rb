@@ -8,31 +8,22 @@ module Config
   # Settings
 
   def config_config
-    register_str :config_file, CM.config_path, 'nucleon.mixin.action.config.options.config_file' do |value|
+    register_str :config_dir, CM.config_dir, 'nucleon.mixin.action.config.options.config_file' do |value|
       success = true
+
       if value
-        file = File.expand_path(value)
-        # Configuration file exists
-        if File.exist?(file)
-          # Configuration invalid?
-          begin
-            provider   = File.extname(file).sub(/^\./, '')
-            translator = Nucleon.translator({}, provider) if provider
-            raise I18n.t('nucleon.mixin.action.config.errors.translator', { :provider => provider, :file => file }) unless translator
-            @system_config = translator.parse(Util::Disk.read(file))
-          rescue => error
-            warn(error.message, { :i18n => false })
-            @system_config = nil
-          end
+        directory = File.expand_path(value)
+
+        # Configuration directory exists
+        if File.exist?(directory)
+          # Get all configurations
+          import_system_config(directory)
 
           # No configuration available?
-          if @system_config.nil?
-            warn('nucleon.mixin.action.config.errors.config_file', { :value => file })
-            success = false
-          end
+          success = false if @system_config.nil?
         else
-          # Non existent configuration file
-          warn('nucleon.mixin.action.config.errors.config_file', { :value => file })
+          # Non existent configuration directory
+          warn('nucleon.mixin.action.config.errors.config_dir', { :directory => directory })
           success = false
         end
       end
@@ -51,6 +42,36 @@ module Config
 
   def system_config
     @system_config
+  end
+
+  #-----------------------------------------------------------------------------
+  # Utilities
+
+  def import_system_config(directory)
+    Nucleon.loaded_plugins(:nucleon, :translator).each do |provider, info|
+      Dir.glob(::File.join(directory, '**', "*.#{provider}")).each do |file|
+        logger.debug("Merging system configurations from: #{file}")
+        if config_data = parse_config_file(file)
+          @system_config = Util::Data.merge([ @system_config, config_data ], true, false)
+        end
+      end
+    end
+  end
+
+  #---
+
+  def parse_config_file(file)
+    begin
+      provider   = File.extname(file).sub(/^\./, '')
+      translator = Nucleon.translator({}, provider) if provider
+      raise I18n.t('nucleon.mixin.action.config.errors.translator', { :provider => provider, :file => file }) unless translator
+      config_data = translator.parse(Util::Disk.read(file))
+    rescue => error
+      warn('nucleon.mixin.action.config.errors.config_file', { :file => file })
+      warn(error.message, { :i18n => false })
+      config_data = nil
+    end
+    config_data
   end
 end
 end

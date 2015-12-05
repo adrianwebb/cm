@@ -9,6 +9,10 @@ en:
           errors:
             translator: |-
               No translator provider available for: %{provider}
+            config_dir: |-
+              Configuration directory does not exist: %{directory}
+            config_file: |-
+              Configuration file can not be parsed: %{file}
   cm:
     action:
       plan:
