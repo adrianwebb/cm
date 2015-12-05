@@ -103,7 +103,11 @@ module CM
   Nucleon.reload(true, :cm) do |op, manager|
     if op == :define
       manager.define_types :CM, {
-
+        :plan          => :default,  # Execution plan
+        :configuration => :file,     # Component and manifest storage
+        :sequence      => :default,  # Event sequence
+        :batch         => :celluloid,# Batch processor
+        :job           => :variables # Individual job
       }
     end
   end
