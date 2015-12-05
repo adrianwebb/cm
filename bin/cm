@@ -9,7 +9,7 @@ begin
   class Parser
     def version
       version = CM.VERSION
-      "CM: #{version}  (Apache License, Version 2.0)  --  https://github.com/adrianwebb/cm/tree/v#{version}"  
+      "cm: #{version}  (Apache License, Version 2.0)  --  https://github.com/adrianwebb/cm/tree/v#{version}"  
     end
   end
   end; end; end
