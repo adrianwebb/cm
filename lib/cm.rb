@@ -101,3 +101,8 @@ module CM
     end
   end
 end
+
+#-------------------------------------------------------------------------------
+# Load CM action overrides
+
+nucleon_require(core_dir, :overrides)
