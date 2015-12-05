@@ -19,14 +19,14 @@ module Config
             provider   = File.extname(file).sub(/^\./, '')
             translator = Nucleon.translator({}, provider) if provider
             raise I18n.t('nucleon.mixin.action.config.errors.translator', { :provider => provider, :file => file }) unless translator
-            @config = translator.parse(Util::Disk.read(file))
+            @system_config = translator.parse(Util::Disk.read(file))
           rescue => error
             warn(error.message, { :i18n => false })
-            @config = nil
+            @system_config = nil
           end
 
           # No configuration available?
-          if @config.nil?
+          if @system_config.nil?
             warn('nucleon.mixin.action.config.errors.config_file', { :value => file })
             success = false
           end
@@ -50,7 +50,7 @@ module Config
   # Properties
 
   def system_config
-    @config
+    @system_config
   end
 end
 end
