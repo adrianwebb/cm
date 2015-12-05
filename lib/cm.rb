@@ -72,6 +72,13 @@ nucleon_require(core_dir, :errors)
 # Include facade
 nucleon_require(core_dir, :facade)
 
+#
+# CM::Facade extends CM
+#
+module CM
+  extend Facade
+end
+
 # Include CM core plugins
 nucleon_require(core_dir, :plugin)
 
