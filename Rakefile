@@ -25,30 +25,22 @@ Jeweler::Tasks.new do |gem|
   # gem is a Gem::Specification... see http://docs.rubygems.org/read/chapter/20 for more options
   gem.name                  = "cm"
   gem.homepage              = "http://github.com/adrianwebb/cm"
-  gem.rubyforge_project     = 'cm'
   gem.license               = "Apache License, Version 2.0"
   gem.email                 = "adrian.webb@gsa.gov"
   gem.authors               = ["Adrian Webb"]
-  gem.summary               = %Q{Framework that provides a simple foundation for deploying and destroying enterprise ready cloud environments and components}
+  gem.summary               = %Q{Pluggable cloud management framework that provides a simple foundation for deploying and destroying enterprise ready cloud environments and components}
   gem.description           = %Q{
-Framework that provides a simple foundation for deploying and destroying
-enterprise ready cloud environments and components that integrate:
-
-1. Cloud provider components and services
-2. Cloud orchestration and configuration management tools
-3. Continuous integration and delivery pipelines
-
-Author::    Adrian Webb (mailto:adrian.webb@gsa.gov)
-License::   Apache License, version 2
-
-Note: This framework is still very early in development!
+Pluggable cloud management framework that provides a simple foundation for
+deploying and destroying enterprise ready cloud environments and components
+that integrate; cloud provider components and services, cloud orchestration
+and configuration management tools, and continuous integration and delivery
+pipelines.
 }
   gem.required_ruby_version = '>= 1.9.1'
   gem.has_rdoc              = true
   gem.rdoc_options << '--title' << 'CM (Cloud Manager)' <<
                       '--main' << 'README.rdoc' <<
                       '--line-numbers'
-
   gem.files = [
     Dir.glob('bin/*'),
     Dir.glob('lib/**/*.rb'),
