@@ -12,7 +12,7 @@ class PlanAction < Nucleon.plugin_class(:nucleon, :cm_action)
 
   def normalize(reload)
     super do
-
+      yield if block_given?
     end
   end
 
