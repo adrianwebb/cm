@@ -93,7 +93,7 @@ module CM
 
   #---
 
-  reload(true, :cm) do |op, manager|
+  Nucleon.reload(true, :cm) do |op, manager|
     if op == :define
       manager.define_types :CM, {
 
