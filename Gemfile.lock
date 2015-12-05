@@ -62,8 +62,8 @@ GEM
     netrc (0.11.0)
     nokogiri (1.6.7)
       mini_portile2 (~> 2.0.0.rc2)
-    nucleon (0.2.13)
-      celluloid (~> 0.16)
+    nucleon (0.2.14)
+      celluloid (~> 0.17)
       childprocess (~> 0.5)
       deep_merge (~> 1.0)
       erubis (~> 2.7)
@@ -85,7 +85,7 @@ GEM
       sawyer (~> 0.6.0, >= 0.5.3)
     rack (1.6.4)
     rake (10.4.2)
-    rdoc (3.12.2)
+    rdoc (4.2.0)
       json (~> 1.4)
     rspec (3.4.0)
       rspec-core (~> 3.4.0)
@@ -113,8 +113,11 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  bundler (~> 1.7)
+  bundler (~> 1.10)
   jeweler (~> 2.0)
   nucleon (~> 0.2)
-  rdoc (~> 3.12)
-  rspec (~> 3.1)
+  rdoc (~> 4.2)
+  rspec (~> 3.4)
+
+BUNDLED WITH
+   1.10.6
