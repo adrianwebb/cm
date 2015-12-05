@@ -1,1 +1,20 @@
 en:
+  nucleon:
+    action:
+      plan:
+        deploy:
+          description: |-
+            Create or update a cloud definition
+          help: |-
+            TODO: Fill this help information in!!
+          info:
+            start: |-
+              Starting deployment of cloud definition
+        destroy:
+          description: |-
+            Destroy a cloud definition
+          help: |-
+            TODO: Fill this help information in!!
+          info:
+            start: |-
+              Destroying cloud environment built from cloud definition
