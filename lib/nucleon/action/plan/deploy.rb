@@ -2,7 +2,7 @@
 module Nucleon
 module Action
 module Plan
-class Deploy < Nucleon.plugin_class(:nucleon, :action)
+class Deploy < Plugin::PlanAction
 
   #-----------------------------------------------------------------------------
   # Info
