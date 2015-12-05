@@ -1,4 +1,14 @@
 en:
+  nucleon:
+    mixin:
+      action:
+        config:
+          options:
+            config_file: |-
+              Configuration file for loading system settings (default %{default_value})
+          errors:
+            translator: |-
+              No translator provider available for: %{provider}
   cm:
     action:
       plan:
