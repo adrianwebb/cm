@@ -2,7 +2,7 @@
 module Nucleon
 module Action
 module Plan
-class Destroy < Plugin::PlanAction
+class Destroy < Nucleon.plugin_class(:nucleon, :plan_action)
 
   #-----------------------------------------------------------------------------
   # Info
