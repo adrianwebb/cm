@@ -16,14 +16,14 @@ class Deploy < Nucleon.plugin_class(:nucleon, :plan_action)
 
   def configure
     super do
-
+      codes :deploy_failed
     end
   end
 
   #---
 
   def arguments
-    []
+    [:manifest]
   end
 
   #-----------------------------------------------------------------------------
@@ -32,6 +32,9 @@ class Deploy < Nucleon.plugin_class(:nucleon, :plan_action)
   def execute
     super do
       info('start')
+      unless plan.deploy(settings)
+        myself.status = code.deploy_failed
+      end
     end
   end
 end

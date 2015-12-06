@@ -16,14 +16,14 @@ class Destroy < Nucleon.plugin_class(:nucleon, :plan_action)
 
   def configure
     super do
-
+      codes :destroy_failed
     end
   end
 
   #---
 
   def arguments
-    []
+    [:manifest]
   end
 
   #-----------------------------------------------------------------------------
@@ -32,6 +32,9 @@ class Destroy < Nucleon.plugin_class(:nucleon, :plan_action)
   def execute
     super do
       info('start')
+      unless plan.destroy(settings)
+        myself.status = code.destroy_failed
+      end
     end
   end
 end
