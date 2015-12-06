@@ -19,7 +19,7 @@ en:
         base:
           options:
             plan: |-
-              Execution plan plugin type (default %{default_value})
+              Execution plan plugin type
             plan_path: |-
               Directory path to the root directory of the plan project
             key_path: |-
