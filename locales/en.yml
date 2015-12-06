@@ -16,6 +16,13 @@ en:
   cm:
     action:
       plan:
+        base:
+          options:
+            plan_provider: |-
+              Execution plan plugin type (default %{default_value})
+          errors:
+            plan_provider: |-
+              Execution plan must be one of the following options: %{choices}
         deploy:
           description: |-
             Create or update a cloud definition
