@@ -25,13 +25,6 @@ class Plan < Nucleon.plugin_class(:nucleon, :parallel_base)
   #-----------------------------------------------------------------------------
   # Property accessors / modifiers
 
-  def system_config
-    get_hash(:system_config)
-  end
-  protected :system_config
-
-  #---
-
   def directory
     get(:directory, Dir.pwd)
   end
@@ -49,14 +42,21 @@ class Plan < Nucleon.plugin_class(:nucleon, :parallel_base)
   #-----------------------------------------------------------------------------
   # Operations
 
-  def deploy(options)
+  def execute(operation, options = {})
+    method = "operation_#{operation}"
+    send(method, options) if respond_to?(method)
+  end
+
+  #---
+
+  def operation_deploy(options)
     config = Nucleon::Config.ensure(options)
 
   end
 
   #---
 
-  def destroy(options)
+  def operation_destroy(options)
     config = Nucleon::Config.ensure(options)
 
   end
