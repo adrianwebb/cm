@@ -8,7 +8,7 @@ module Config
   # Settings
 
   def config_config
-    register_str :config_dir, CM.config_dir, 'nucleon.mixin.action.config.options.config_file' do |value|
+    register_str :config_dir, CM.config_dir, 'nucleon.mixin.action.config.options.config_dir' do |value|
       success = true
 
       if value
@@ -34,26 +34,32 @@ module Config
   #---
 
   def config_ignore
-    [ :config_file ]
+    [ :config_dir ]
   end
 
   #-----------------------------------------------------------------------------
   # Properties
 
-  def system_config
-    @system_config
-  end
-
   #-----------------------------------------------------------------------------
   # Utilities
 
   def import_system_config(directory)
+    @system_config = {}
+
+    # Merge all system configurations
     Nucleon.loaded_plugins(:nucleon, :translator).each do |provider, info|
       Dir.glob(::File.join(directory, '**', "*.#{provider}")).each do |file|
         logger.debug("Merging system configurations from: #{file}")
         if config_data = parse_config_file(file)
           @system_config = Util::Data.merge([ @system_config, config_data ], true, false)
         end
+      end
+    end
+
+    # Values are already set from parameters and validation is just starting
+    @system_config.each do |key, value|
+      if settings[key] == config[key].default
+        settings[key] = value
       end
     end
   end
