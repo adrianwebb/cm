@@ -21,6 +21,12 @@ class PlanAction < Nucleon.plugin_class(:nucleon, :cm_action)
 
   def configure
     super do
+      register_plan_provider :plan, Nucleon.type_default(:CM, :plan), [
+        'cm.action.plan.base.options.plan_provider',
+        'cm.action.plan.base.errors.plan_provider'
+      ] do |value, success|
+        @plan = CM.plan(plugin_name, {}, value) if success
+      end
       yield if block_given?
     end
   end
@@ -45,9 +51,6 @@ class PlanAction < Nucleon.plugin_class(:nucleon, :cm_action)
   #-----------------------------------------------------------------------------
   # Utilities
 
-  def initialize_plan
-
-  end
 end
 end
 end
