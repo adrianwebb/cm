@@ -43,7 +43,6 @@ class PlanAction < Nucleon.plugin_class(:nucleon, :cm_action)
 
   def execute(&block)
     super do
-      initialize_plan
       block.call
     end
   end
