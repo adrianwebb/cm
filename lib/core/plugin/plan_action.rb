@@ -7,6 +7,8 @@ module Nucleon
 module Plugin
 class PlanAction < Nucleon.plugin_class(:nucleon, :cm_action)
 
+  include Mixin::Action::Project
+
   #-----------------------------------------------------------------------------
   # Constuctor / Destructor
 
@@ -25,18 +27,21 @@ class PlanAction < Nucleon.plugin_class(:nucleon, :cm_action)
         'cm.action.plan.base.options.plan',
         'cm.action.plan.base.errors.plan'
       ]
-      register_directory :plan_path, Dir.pwd, [
+      register_str :plan_path, Dir.pwd, [
         'cm.action.plan.base.options.plan_path',
         'cm.action.plan.base.errors.plan_path'
-      ]
-      register_directory :key_path, Dir.pwd, [
-        'cm.action.plan.base.options.key_path',
-        'cm.action.plan.base.errors.key_path'
       ]
       register_str :manifest, 'plan.yml', [
         'cm.action.plan.base.options.manifest',
         'cm.action.plan.base.errors.manifest'
       ]
+      register_directory :key_path, Dir.pwd, [
+        'cm.action.plan.base.options.key_path',
+        'cm.action.plan.base.errors.key_path'
+      ]
+
+      project_config
+
       yield if block_given?
     end
   end
@@ -63,9 +68,12 @@ class PlanAction < Nucleon.plugin_class(:nucleon, :cm_action)
 
   def initialize_plan
     @plan = CM.plan(plugin_name, {
-      :directory     => settings[:plan_path],
-      :key_directory => settings[:key_path],
-      :manifest      => settings[:manifest]
+      :directory       => settings[:plan_path],
+      :key_directory   => settings[:key_path],
+      :manifest        => settings[:manifest],
+      :project_proider => settings[:project_provider],
+      :url             => settings[:project_reference],
+      :revision        => settings[:project_revision]
     }, settings[:plan_provider])
   end
 end
