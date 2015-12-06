@@ -12,6 +12,18 @@ class Plan < Nucleon.plugin_class(:nucleon, :parallel_base)
 
   def normalize(reload)
     super
+
+    @project = Nucleon.project(extended_config(:plan_project, {
+      :provider       => get(:project_provider, Nucleon.type_default(:nucleon, :project)),
+      :directory      => get(:directory, Dir.pwd),
+      :url            => get(:url),
+      :revision       => get(:revision, :master),
+      :create         => true,
+      :pull           => true,
+      :nucleon_resave => false,
+      :nucleon_cache  => false
+    }))
+
     yield if block_given?
   end
 
@@ -25,8 +37,14 @@ class Plan < Nucleon.plugin_class(:nucleon, :parallel_base)
   #-----------------------------------------------------------------------------
   # Property accessors / modifiers
 
+  def project
+    @project
+  end
+
+  #---
+
   def directory
-    get(:directory, Dir.pwd)
+    project.directory
   end
 
   def key_directory
@@ -37,6 +55,20 @@ class Plan < Nucleon.plugin_class(:nucleon, :parallel_base)
 
   def manifest
     get(:manifest, 'plan.yml')
+  end
+
+  def manifest_path
+    File.join(directory, manifest)
+  end
+
+  #---
+
+  def url
+    project.url
+  end
+
+  def revision
+    project.revision
   end
 
   #-----------------------------------------------------------------------------
