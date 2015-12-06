@@ -18,10 +18,14 @@ en:
       plan:
         base:
           options:
-            plan_provider: |-
+            plan: |-
               Execution plan plugin type (default %{default_value})
+            plan_path: |-
+              File path to the root directory of the plan project (default %{default_value})
+            key_path: |-
+              File path of the SSH private key directory (default %{default_value})
           errors:
-            plan_provider: |-
+            plan: |-
               Execution plan must be one of the following options: %{choices}
         deploy:
           description: |-
