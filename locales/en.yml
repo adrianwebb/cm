@@ -21,12 +21,20 @@ en:
             plan: |-
               Execution plan plugin type (default %{default_value})
             plan_path: |-
-              File path to the root directory of the plan project (default %{default_value})
+              Directory path to the root directory of the plan project (default %{default_value})
             key_path: |-
               File path of the SSH private key directory (default %{default_value})
+            manifest: |-
+              File path of the execution plan manifest file (default %{default_value})
           errors:
             plan: |-
               Execution plan must be one of the following options: %{choices}
+            plan_path: |-
+              Plan top level directory  (%{directory}) does not exist or is not readable
+            key_path: |-
+              Private SSH key top level directory (%{directory}) does not exist or is not readable
+            manifest: |-
+              Execution plan manifest file (%{file}) does not exist or is not readable
         deploy:
           description: |-
             Create or update a cloud definition
