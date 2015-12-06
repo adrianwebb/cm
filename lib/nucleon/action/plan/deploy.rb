@@ -32,7 +32,7 @@ class Deploy < Nucleon.plugin_class(:nucleon, :plan_action)
   def execute
     super do
       info('start')
-      unless plan.deploy(settings)
+      unless plan.execute(:deploy)
         myself.status = code.deploy_failed
       end
     end

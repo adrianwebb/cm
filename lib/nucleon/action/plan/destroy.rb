@@ -32,7 +32,7 @@ class Destroy < Nucleon.plugin_class(:nucleon, :plan_action)
   def execute
     super do
       info('start')
-      unless plan.destroy(settings)
+      unless plan.execute(:destroy)
         myself.status = code.destroy_failed
       end
     end
