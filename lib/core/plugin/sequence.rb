@@ -1,7 +1,11 @@
 
+nucleon_require(File.dirname(__FILE__), :parallel_base)
+
+#---
+
 module CM
 module Plugin
-class Sequence < Nucleon.plugin_class(:nucleon, :base)
+class Sequence < Nucleon.plugin_class(:nucleon, :parallel_base)
 
   #-----------------------------------------------------------------------------
   # Plugin interface
