@@ -119,7 +119,7 @@ class Plan < Nucleon.plugin_class(:nucleon, :parallel_base)
   def load
     success = false
     if config_data = parse_manifest_file(manifest_path)
-      merge(config_data, { :force => true, :basic => false })
+      import(config_data, { :force => true, :basic => false })
       success = true
     end
     success
