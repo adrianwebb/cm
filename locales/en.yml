@@ -4,8 +4,8 @@ en:
       action:
         config:
           options:
-            config_file: |-
-              Configuration file for loading system settings (default %{default_value})
+            config_dir: |-
+              Configuration directory for loading system settings (default %{default_value})
           errors:
             translator: |-
               No translator provider available for: %{provider}
@@ -21,11 +21,11 @@ en:
             plan: |-
               Execution plan plugin type (default %{default_value})
             plan_path: |-
-              Directory path to the root directory of the plan project (default %{default_value})
+              Directory path to the root directory of the plan project
             key_path: |-
-              File path of the SSH private key directory (default %{default_value})
+              File path of the SSH private key directory
             manifest: |-
-              File path of the execution plan manifest file (default %{default_value})
+              File path of the execution plan manifest file
           errors:
             plan: |-
               Execution plan must be one of the following options: %{choices}
