@@ -21,9 +21,21 @@ class PlanAction < Nucleon.plugin_class(:nucleon, :cm_action)
 
   def configure
     super do
-      register_plan_provider :plan, Nucleon.type_default(:CM, :plan), [
-        'cm.action.plan.base.options.plan_provider',
-        'cm.action.plan.base.errors.plan_provider'
+      register_plan_provider :plan_provider, Nucleon.type_default(:CM, :plan), [
+        'cm.action.plan.base.options.plan',
+        'cm.action.plan.base.errors.plan'
+      ]
+      register_directory :plan_path, Dir.pwd, [
+        'cm.action.plan.base.options.plan_path',
+        'cm.action.plan.base.errors.plan_path'
+      ]
+      register_directory :key_path, Dir.pwd, [
+        'cm.action.plan.base.options.key_path',
+        'cm.action.plan.base.errors.key_path'
+      ]
+      register_file :manifest, nil, [
+        'cm.action.plan.base.options.manifest',
+        'cm.action.plan.base.errors.manifest'
       ]
       yield if block_given?
     end
@@ -50,7 +62,11 @@ class PlanAction < Nucleon.plugin_class(:nucleon, :cm_action)
   # Utilities
 
   def initialize_plan
-    @plan = CM.plan(plugin_name, {}, settings[:plan])
+    @plan = CM.plan(plugin_name, {
+      :directory     => settings[:plan_path],
+      :key_directory => settings[:key_path],
+      :manifest      => settings[:manifest]
+    }, settings[:plan_provider])
   end
 end
 end
