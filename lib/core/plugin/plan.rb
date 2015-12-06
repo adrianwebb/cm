@@ -25,8 +25,41 @@ class Plan < Nucleon.plugin_class(:nucleon, :parallel_base)
   #-----------------------------------------------------------------------------
   # Property accessors / modifiers
 
+  def system_config
+    get_hash(:system_config)
+  end
+  protected :system_config
+
+  #---
+
+  def directory
+    get(:directory, Dir.pwd)
+  end
+
+  def key_directory
+    get(:key_directory, Dir.pwd)
+  end
+
+  #---
+
+  def manifest
+    get(:manifest, 'plan.yml')
+  end
+
   #-----------------------------------------------------------------------------
   # Operations
+
+  def deploy(options)
+    config = Nucleon::Config.ensure(options)
+
+  end
+
+  #---
+
+  def destroy(options)
+    config = Nucleon::Config.ensure(options)
+
+  end
 
   #-----------------------------------------------------------------------------
   # Utilities
