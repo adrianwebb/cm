@@ -117,3 +117,8 @@ end
 # Load CM action overrides
 
 nucleon_require(core_dir, :overrides)
+
+#
+# Temporarily set dump_enabled by default during initial development
+#
+Nucleon.dump_enabled=true
