@@ -58,7 +58,9 @@ module Config
 
     # Values are already set from parameters and validation is just starting
     @system_config.each do |key, value|
-      if settings[key] == config[key].default
+      # TODO: Some error handling here if config key doesn't exist
+      # For instance, if extra properties in config file
+      if !config.has_key?(key) || settings[key] == config[key].default
         settings[key] = value
       end
     end
