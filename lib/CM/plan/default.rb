@@ -1,7 +1,7 @@
 
 module CM
 module Plan
-class AWS < Nucleon.plugin_class(:CM, :plan)
+class Default < Nucleon.plugin_class(:CM, :plan)
 
   #-----------------------------------------------------------------------------
   # Plugin interface
