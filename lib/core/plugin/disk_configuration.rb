@@ -7,6 +7,10 @@ module CM
 module Plugin
 class DiskConfiguration < Nucleon.plugin_class(:CM, :configuration)
 
+  def self.register_ids
+    [ :name, :path ]
+  end
+
   #-----------------------------------------------------------------------------
   # Plugin interface
 
