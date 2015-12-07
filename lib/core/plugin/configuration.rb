@@ -73,7 +73,7 @@ class Configuration < Nucleon.plugin_class(:nucleon, :parallel_base)
       if keys.nil?
         import(properties)
       else
-        set(keys, Nucleon::Config.ensure(get(keys)).import(properties).export)
+        set(keys, Nucleon::Config.new(get(keys), {}, true, false).import(properties).export)
       end
       yield if block_given?
     end
