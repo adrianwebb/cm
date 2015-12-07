@@ -15,7 +15,7 @@ class Directory < Nucleon.plugin_class(:CM, :disk_configuration)
   # Checks
 
   def initialized?(options = {})
-    File.directory?(path)
+    ::File.directory?(path)
   end
 
   #-----------------------------------------------------------------------------
@@ -26,7 +26,7 @@ class Directory < Nucleon.plugin_class(:CM, :disk_configuration)
   end
 
   def target_path
-    File.join(path, output_file)
+    ::File.join(path, output_file)
   end
 
   #-----------------------------------------------------------------------------
