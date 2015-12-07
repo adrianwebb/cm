@@ -55,6 +55,7 @@ class Configuration < Nucleon.plugin_class(:nucleon, :parallel_base)
       clear if wipe
       yield if block_given?
     end
+    export
   end
 
   #---
