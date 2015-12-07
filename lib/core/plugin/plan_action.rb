@@ -68,7 +68,7 @@ class PlanAction < Nucleon.plugin_class(:nucleon, :cm_action)
 
   def initialize_plan
     @plan = CM.plan(plugin_name, extended_config(:plan, {
-      :directory        => settings[:plan_path],
+      :path             => settings[:plan_path],
       :key_directory    => settings[:key_path],
       :manifest_file    => settings[:manifest],
       :project_provider => settings[:project_provider],
