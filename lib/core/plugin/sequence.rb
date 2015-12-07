@@ -28,6 +28,32 @@ class Sequence < Nucleon.plugin_class(:nucleon, :parallel_base)
   #-----------------------------------------------------------------------------
   # Operations
 
+  def forward(options)
+    config = Nucleon::Config.ensure(options)
+
+    if initialized?
+      success = true
+      success = yield(config) if block_given?
+    else
+      success = false
+    end
+    success
+  end
+
+  #---
+
+  def reverse(options)
+    config = Nucleon::Config.ensure(options)
+
+    if initialized?
+      success = true
+      success = yield(config) if block_given?
+    else
+      success = false
+    end
+    success
+  end
+
   #-----------------------------------------------------------------------------
   # Utilities
 
