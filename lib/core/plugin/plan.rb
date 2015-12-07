@@ -7,12 +7,6 @@ module CM
 module Plugin
 class Plan < Nucleon.plugin_class(:CM, :disk_configuration)
 
-  #---
-
-  def self.register_ids
-    [ :name, :path ]
-  end
-
   #-----------------------------------------------------------------------------
   # Plugin interface
 
@@ -34,7 +28,7 @@ class Plan < Nucleon.plugin_class(:CM, :disk_configuration)
     if project
       @loaded_config = CM.configuration(extended_config(:config_data, {
         :provider => _get(:config_provider, :directory),
-        :path => path
+        :path => config_directory
       }))
 
       yield if block_given?
@@ -126,6 +120,8 @@ class Plan < Nucleon.plugin_class(:CM, :disk_configuration)
   # Operations
 
   def load
+    success = true
+
     if initialized?
       # Initialize plan manifest (default config and jobs)
       wipe
@@ -145,6 +141,7 @@ class Plan < Nucleon.plugin_class(:CM, :disk_configuration)
 
       yield if block_given?
     end
+    success
   end
 
   #---
