@@ -5,7 +5,7 @@ nucleon_require(File.dirname(__FILE__), :disk_configuration)
 
 module CM
 module Plugin
-class Plan < Nucleon.plugin_class(:nucleon, :disk_configuration)
+class Plan < Nucleon.plugin_class(:CM, :disk_configuration)
 
   #---
 
@@ -66,7 +66,7 @@ class Plan < Nucleon.plugin_class(:nucleon, :disk_configuration)
   end
 
   def key_directory
-    _get(:key_directory, directory)
+    _get(:key_directory, path)
   end
 
   #---
@@ -76,7 +76,7 @@ class Plan < Nucleon.plugin_class(:nucleon, :disk_configuration)
   end
 
   def manifest_path
-    File.join(directory, manifest_file)
+    ::File.join(path, manifest_file)
   end
 
   def manifest
@@ -94,7 +94,7 @@ class Plan < Nucleon.plugin_class(:nucleon, :disk_configuration)
   #---
 
   def config_directory
-    _get(:config_directory, directory)
+    _get(:config_directory, path)
   end
 
   def output_file
@@ -102,7 +102,7 @@ class Plan < Nucleon.plugin_class(:nucleon, :disk_configuration)
   end
 
   def target_path
-    File.join(config_directory, output_file)
+    ::File.join(config_directory, output_file)
   end
 
 
@@ -153,7 +153,7 @@ class Plan < Nucleon.plugin_class(:nucleon, :disk_configuration)
     success = true
 
     if initialized?
-      if File.exist?(manifest_path)
+      if ::File.exist?(manifest_path)
         method = "operation_#{operation}"
         success = send(method, options) if respond_to?(method) && load
         success = save if success
