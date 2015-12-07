@@ -47,7 +47,7 @@ module Config
 
     unless system_config.nil?
       # Values are already set from parameters and validation is just starting
-      system_config.export.each do |key, value|
+      system_config.each do |key, value|
         # TODO: Some error handling here if config key doesn't exist
         # For instance, if extra properties in config file
         if !config.has_key?(key) || settings[key] == config[key].default
