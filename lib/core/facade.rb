@@ -39,7 +39,7 @@ module Facade
     Nucleon.plugin(:CM, :sequence, provider, options)
   end
 
-  def sequence(data, build_hash = false, keep_array = false)
+  def sequences(data, build_hash = false, keep_array = false)
     Nucleon.plugins(:CM, :sequence, data, build_hash, keep_array)
   end
 
@@ -49,7 +49,7 @@ module Facade
     Nucleon.plugin(:CM, :batch, provider, options)
   end
 
-  def batch(data, build_hash = false, keep_array = false)
+  def batches(data, build_hash = false, keep_array = false)
     Nucleon.plugins(:CM, :batch, data, build_hash, keep_array)
   end
 
