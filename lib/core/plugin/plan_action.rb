@@ -70,7 +70,7 @@ class PlanAction < Nucleon.plugin_class(:nucleon, :cm_action)
     @plan = CM.plan(plugin_name, extended_config(:plan, {
       :directory        => settings[:plan_path],
       :key_directory    => settings[:key_path],
-      :manifest         => settings[:manifest],
+      :manifest_file    => settings[:manifest],
       :project_provider => settings[:project_provider],
       :url              => settings[:project_reference],
       :revision         => settings[:project_revision]
