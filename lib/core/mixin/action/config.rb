@@ -8,7 +8,7 @@ module Config
   # Settings
 
   def config_config
-    register_str :config_path, CM.config_path, 'nucleon.mixin.action.config.options.config_path' do |value|
+    register_str :settings_path, CM.config_path, 'nucleon.mixin.action.config.options.settings_path' do |value|
       success = true
 
       if value
@@ -17,7 +17,7 @@ module Config
         if File.exist?(path)
           success = false unless import_system_config(path)
         else
-          warn('nucleon.mixin.action.config.errors.config_path', { :path => path })
+          warn('nucleon.mixin.action.config.errors.settings_path', { :path => path })
           success = false
         end
       end
@@ -28,7 +28,7 @@ module Config
   #---
 
   def config_ignore
-    [ :config_path ]
+    [ :settings_path ]
   end
 
   #-----------------------------------------------------------------------------
@@ -43,7 +43,7 @@ module Config
       :path => path,
       :translator_error => 'nucleon.mixin.action.config.errors.translator',
       :config_error => 'nucleon.mixin.action.config.errors.config_file'
-    }), config_provider).parse
+    }), config_provider).export
 
     unless system_config.nil?
       # Values are already set from parameters and validation is just starting
