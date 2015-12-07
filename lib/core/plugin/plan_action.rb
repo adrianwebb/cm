@@ -35,6 +35,10 @@ class PlanAction < Nucleon.plugin_class(:nucleon, :cm_action)
         'cm.action.plan.base.options.manifest',
         'cm.action.plan.base.errors.manifest'
       ]
+      register_directory :config_path, Dir.pwd, [
+        'cm.action.plan.base.options.config_path',
+        'cm.action.plan.base.errors.config_path'
+      ]
       register_directory :key_path, Dir.pwd, [
         'cm.action.plan.base.options.key_path',
         'cm.action.plan.base.errors.key_path'
@@ -69,6 +73,7 @@ class PlanAction < Nucleon.plugin_class(:nucleon, :cm_action)
   def initialize_plan
     @plan = CM.plan(plugin_name, extended_config(:plan, {
       :path             => settings[:plan_path],
+      :config_directory => settings[:config_path],
       :key_directory    => settings[:key_path],
       :manifest_file    => settings[:manifest],
       :project_provider => settings[:project_provider],
