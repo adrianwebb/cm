@@ -11,7 +11,7 @@ Gem::Specification.new do |s|
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.require_paths = ["lib"]
   s.authors = ["Adrian Webb"]
-  s.date = "2015-12-05"
+  s.date = "2015-12-07"
   s.description = "\nPluggable cloud management framework that provides a simple foundation for\ndeploying and destroying enterprise ready cloud environments and components\nthat integrate; cloud provider components and services, cloud orchestration\nand configuration management tools, and continuous integration and delivery\npipelines.\n"
   s.email = "adrian.webb@gsa.gov"
   s.executables = ["cm"]
@@ -26,13 +26,31 @@ Gem::Specification.new do |s|
     "VERSION",
     "bin/cm",
     "cm.gemspec",
+    "lib/CM/batch/celluloid.rb",
+    "lib/CM/configuration/directory.rb",
+    "lib/CM/configuration/file.rb",
+    "lib/CM/job/AWS.rb",
+    "lib/CM/job/BOSH.rb",
+    "lib/CM/job/concourse.rb",
+    "lib/CM/job/keypair.rb",
+    "lib/CM/job/variables.rb",
+    "lib/CM/plan/default.rb",
+    "lib/CM/sequence/default.rb",
     "lib/cm.rb",
     "lib/core/errors.rb",
     "lib/core/facade.rb",
     "lib/core/mixin/action/config.rb",
+    "lib/core/mixin/action/registration.rb",
     "lib/core/overrides.rb",
+    "lib/core/plugin/batch.rb",
     "lib/core/plugin/cm_action.rb",
+    "lib/core/plugin/configuration.rb",
+    "lib/core/plugin/disk_configuration.rb",
+    "lib/core/plugin/job.rb",
+    "lib/core/plugin/parallel_base.rb",
+    "lib/core/plugin/plan.rb",
     "lib/core/plugin/plan_action.rb",
+    "lib/core/plugin/sequence.rb",
     "lib/nucleon/action/plan/deploy.rb",
     "lib/nucleon/action/plan/destroy.rb",
     "locales/en.yml",
