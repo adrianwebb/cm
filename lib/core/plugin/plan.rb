@@ -1,18 +1,16 @@
 
-nucleon_require(File.dirname(__FILE__), :parallel_base)
+nucleon_require(File.dirname(__FILE__), :disk_configuration)
 
 #---
 
 module CM
 module Plugin
-class Plan < Nucleon.plugin_class(:nucleon, :parallel_base)
-
-  include Nucleon::Mixin::SubConfig
+class Plan < Nucleon.plugin_class(:nucleon, :disk_configuration)
 
   #---
 
   def self.register_ids
-    [ :name, :directory ]
+    [ :name, :path ]
   end
 
   #-----------------------------------------------------------------------------
@@ -21,12 +19,9 @@ class Plan < Nucleon.plugin_class(:nucleon, :parallel_base)
   def normalize(reload)
     super
 
-    logger.debug("Initializing source sub configuration")
-    init_subconfig(true) unless reload
-
     @project = Nucleon.project(extended_config(:plan_project, {
       :provider       => _get(:project_provider, Nucleon.type_default(:nucleon, :project)),
-      :directory      => _get(:directory, Dir.pwd),
+      :directory      => _get(:path, Dir.pwd),
       :url            => _get(:url),
       :revision       => _get(:revision, :master),
       :create         => true,
@@ -36,14 +31,21 @@ class Plan < Nucleon.plugin_class(:nucleon, :parallel_base)
       :nucleon_file   => false
     }))
 
-    yield if block_given?
+    if project
+      @loaded_config = CM.configuration(extended_config(:config_data, {
+        :provider => _get(:config_provider, :directory),
+        :path => path
+      }))
+
+      yield if block_given?
+    end
   end
 
   #-----------------------------------------------------------------------------
   # Checks
 
   def initialized?(options = {})
-    true
+    project && loaded_config
   end
 
   #-----------------------------------------------------------------------------
@@ -53,25 +55,56 @@ class Plan < Nucleon.plugin_class(:nucleon, :parallel_base)
     @project
   end
 
+  def loaded_config
+    @loaded_config
+  end
+
   #---
 
-  def directory
+  def path
     project.directory
   end
 
   def key_directory
-    _get(:key_directory, Dir.pwd)
+    _get(:key_directory, directory)
   end
 
   #---
 
-  def manifest
-    _get(:manifest, 'plan.yml')
+  def manifest_file
+    _get(:manifest_file, 'plan.yml')
   end
 
   def manifest_path
-    File.join(directory, manifest)
+    File.join(directory, manifest_file)
   end
+
+  def manifest
+    export
+  end
+
+  def manifest_config
+    get_hash(:config)
+  end
+
+  def manifest_jobs
+    get_array(:jobs)
+  end
+
+  #---
+
+  def config_directory
+    _get(:config_directory, directory)
+  end
+
+  def output_file
+    _get(:output_file, "rendered.#{manifest_file.gsub(/#{File::SEPARATOR}+/, '.')}")
+  end
+
+  def target_path
+    File.join(config_directory, output_file)
+  end
+
 
   #---
 
@@ -83,17 +116,53 @@ class Plan < Nucleon.plugin_class(:nucleon, :parallel_base)
     project.revision
   end
 
+  #---
+
+  def sequence
+    @sequence
+  end
+
   #-----------------------------------------------------------------------------
   # Operations
+
+  def load
+    if initialized?
+      # Initialize plan manifest (default config and jobs)
+      wipe
+      import(CM.configuration(extended_config(:manifest_data, {
+        :provider => _get(:manifest_provider, :file),
+        :path => manifest_path
+      })).export)
+
+      # Merge in configuration overlay (private config)
+      override(loaded_config.get_hash(:config), :config)
+
+      # Initialize job sequence
+      @sequence = CM.sequence({
+        :jobs => manifest_jobs,
+        :config => manifest_config
+      }, _get(:sequence_provider, :default))
+
+      yield if block_given?
+    end
+  end
+
+  #---
 
   def execute(operation, options = {})
     success = true
 
-    if File.exist?(manifest_path)
-      method = "operation_#{operation}"
-      success = send(method, options) if respond_to?(method) && load
+    if initialized?
+      if File.exist?(manifest_path)
+        method = "operation_#{operation}"
+        success = send(method, options) if respond_to?(method) && load
+        success = save if success
+        success
+      else
+        error('manifest_file', { :file => manifest_path })
+        success = false
+      end
     else
-      error('manifest_file', { :file => manifest_path })
       success = false
     end
     success
@@ -103,67 +172,25 @@ class Plan < Nucleon.plugin_class(:nucleon, :parallel_base)
 
   def operation_deploy(options)
     config = Nucleon::Config.ensure(options)
-
+    sequence.forward(config)
   end
 
   #---
 
   def operation_destroy(options)
     config = Nucleon::Config.ensure(options)
-
-  end
-
-  #-----------------------------------------------------------------------------
-  # Utilities
-
-  def load
-    success = false
-    if config_data = parse_manifest_file(manifest_path)
-      import(config_data, { :force => true, :basic => false })
-      success = true
-    end
-    success
+    sequence.reverse(config)
   end
 
   #---
 
   def save
-    save_manifest_config(manifest_path, export)
+    save_config(target_path, { :config => manifest_config })
   end
 
-  #---
+  #-----------------------------------------------------------------------------
+  # Utilities
 
-  def parse_manifest_file(file)
-    begin
-      provider   = File.extname(file).sub(/^\./, '')
-      translator = Nucleon.translator({}, provider) if provider
-      raise render_message('translator', { :provider => provider, :file => file }) unless translator
-      config_data = translator.parse(Nucleon::Util::Disk.read(file))
-    rescue => error
-      error('config_file', { :file => file })
-      error(error.message, { :i18n => false })
-      config_data = nil
-    end
-    config_data
-  end
-  protected :parse_manifest_file
-
-  #---
-
-  def save_manifest_config(file, properties)
-    begin
-      provider   = File.extname(file).sub(/^\./, '')
-      translator = Nucleon.translator({}, provider) if provider
-      raise render_message('translator', { :provider => provider, :file => file }) unless translator
-      success = Nucleon::Util::Disk.write(file, translator.generate(properties))
-    rescue => error
-      error('config_file', { :file => file })
-      error(error.message, { :i18n => false })
-      success = false
-    end
-    success
-  end
-  protected :save_manifest_config
 end
 end
 end
