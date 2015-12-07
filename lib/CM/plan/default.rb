@@ -14,10 +14,6 @@ class Default < Nucleon.plugin_class(:CM, :plan)
   #-----------------------------------------------------------------------------
   # Checks
 
-  def initialized?(options = {})
-    true
-  end
-
   #-----------------------------------------------------------------------------
   # Property accessors / modifiers
 
