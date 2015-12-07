@@ -4,13 +4,13 @@ en:
       action:
         config:
           options:
-            config_dir: |-
-              Configuration directory for loading system settings (default %{default_value})
+            config_path: |-
+              Configuration path for loading system settings (default %{default_value})
           errors:
             translator: |-
               No translator provider available for: %{provider}
-            config_dir: |-
-              Configuration directory does not exist: %{directory}
+            config_path: |-
+              Configuration path does not exist: %{path}
             config_file: |-
               Configuration file can not be parsed: %{file}
   plan:
