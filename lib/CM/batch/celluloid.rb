@@ -14,10 +14,6 @@ class Celluloid < Nucleon.plugin_class(:CM, :batch)
   #-----------------------------------------------------------------------------
   # Checks
 
-  def initialized?(options = {})
-    true
-  end
-
   #-----------------------------------------------------------------------------
   # Property accessors / modifiers
 
@@ -27,6 +23,16 @@ class Celluloid < Nucleon.plugin_class(:CM, :batch)
   #-----------------------------------------------------------------------------
   # Utilities
 
+  def execute_parallel
+    values = []
+    jobs.each do |job|
+      values << Celluloid::Future.new(job) do
+        job.execute(sequence.settings)
+      end
+    end
+    values = values.map { |future| future.value }
+    !values.include?(false)
+  end
 end
 end
 end
