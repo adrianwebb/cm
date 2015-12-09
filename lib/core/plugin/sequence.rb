@@ -12,6 +12,8 @@ class Sequence < Nucleon.plugin_class(:nucleon, :parallel_base)
 
   def normalize(reload)
     super
+
+    init_jobs
     yield if block_given?
   end
 
@@ -19,11 +21,38 @@ class Sequence < Nucleon.plugin_class(:nucleon, :parallel_base)
   # Checks
 
   def initialized?(options = {})
-    true
+    !@jobs.empty?
   end
 
   #-----------------------------------------------------------------------------
   # Property accessors / modifiers
+
+  def settings
+    get_hash(:settings)
+  end
+
+  #---
+
+  def init_jobs
+    @jobs = []
+    get_array(:jobs).each do |job_config|
+      if job_config.has_key?(:aggregate) # Array
+        @jobs << create_batch(job_config[:aggregate])
+      else # Atomic
+        @jobs << create_job(job_config)
+      end
+    end
+    @jobs
+  end
+
+  def jobs
+    @jobs
+  end
+
+  def jobs=jobs
+    set(:jobs, Nucleon::Util::Data.array(jobs))
+    init_jobs
+  end
 
   #-----------------------------------------------------------------------------
   # Operations
@@ -33,7 +62,7 @@ class Sequence < Nucleon.plugin_class(:nucleon, :parallel_base)
 
     if initialized?
       success = true
-      success = yield(config) if block_given?
+      success = yield(config, success) if block_given?
     else
       success = false
     end
@@ -47,7 +76,7 @@ class Sequence < Nucleon.plugin_class(:nucleon, :parallel_base)
 
     if initialized?
       success = true
-      success = yield(config) if block_given?
+      success = yield(config, success) if block_given?
     else
       success = false
     end
@@ -57,6 +86,22 @@ class Sequence < Nucleon.plugin_class(:nucleon, :parallel_base)
   #-----------------------------------------------------------------------------
   # Utilities
 
+  def create_sequence(jobs)
+    CM.sequence({ :settings => settings, :jobs => jobs }, get(:sequence_provider, :default))
+  end
+
+  #---
+
+  def create_batch(jobs)
+    CM.batch({ :sequence => myself, :jobs => jobs }, get(:batch_provider, :celluloid))
+  end
+
+  #---
+
+  def create_job(settings)
+    settings[:type] ||= get(:default_job_provider, :variables)
+    CM.job({ :settings => settings }, settings[:type])
+  end
 end
 end
 end
