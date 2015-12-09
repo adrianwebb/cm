@@ -28,6 +28,16 @@ class Job < Nucleon.plugin_class(:nucleon, :parallel_base)
   #-----------------------------------------------------------------------------
   # Operations
 
+  def execute(settings)
+    if initialized?
+      success = true
+      success = yield if block_given?
+    else
+      success = false
+    end
+    success
+  end
+
   #-----------------------------------------------------------------------------
   # Utilities
 
