@@ -20,6 +20,26 @@ class Default < Nucleon.plugin_class(:CM, :sequence)
   #-----------------------------------------------------------------------------
   # Operations
 
+  def forward(options)
+    super do |config, success|
+      jobs.each do |job|
+        success = false unless job.execute(settings)
+      end
+      success
+    end
+  end
+
+  #---
+
+  def reverse(options)
+    super do |config, success|
+      jobs.reverse.each do |job|
+        success = false unless job.execute(settings)
+      end
+      success
+    end
+  end
+
   #-----------------------------------------------------------------------------
   # Utilities
 
