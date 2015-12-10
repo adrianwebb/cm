@@ -7,6 +7,10 @@ module CM
 module Plugin
 class Plan < Nucleon.plugin_class(:CM, :disk_configuration)
 
+  def self.register_ids
+    [ :directory, :revision ]
+  end
+
   #-----------------------------------------------------------------------------
   # Plugin interface
 
@@ -25,7 +29,7 @@ class Plan < Nucleon.plugin_class(:CM, :disk_configuration)
       :nucleon_file   => false
     }))
 
-    if project
+    if project && !reload
       @loaded_config = CM.configuration(extended_config(:config_data, {
         :provider => _get(:config_provider, :directory),
         :path => config_directory
