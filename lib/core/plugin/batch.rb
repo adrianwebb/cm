@@ -61,9 +61,9 @@ class Batch < Nucleon.plugin_class(:nucleon, :parallel_base)
   #-----------------------------------------------------------------------------
   # Operations
 
-  def execute(settings, parallel = true)
+  def execute
     if initialized?
-      if Nucleon.parallel? && parallel
+      if Nucleon.parallel?
         success = execute_parallel
       else
         success = execute_sequence
@@ -86,7 +86,7 @@ class Batch < Nucleon.plugin_class(:nucleon, :parallel_base)
   def execute_sequence
     success = true
     jobs.each do |job|
-      success = false unless job.execute(sequence.settings)
+      success = false unless job.execute
     end
     success
   end
