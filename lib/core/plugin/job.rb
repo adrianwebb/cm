@@ -7,6 +7,10 @@ module CM
 module Plugin
 class Job < Nucleon.plugin_class(:nucleon, :parallel_base)
 
+  def self.register_ids
+    [ :id ]
+  end
+
   #-----------------------------------------------------------------------------
   # Plugin interface
 
@@ -36,6 +40,16 @@ class Job < Nucleon.plugin_class(:nucleon, :parallel_base)
 
   def settings
     get_hash(:settings)
+  end
+
+  #---
+
+  def id
+    get(:id, '')
+  end
+
+  def parameters
+    hash(settings[:parameters])
   end
 
   #-----------------------------------------------------------------------------
