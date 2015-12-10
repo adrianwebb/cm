@@ -81,10 +81,13 @@ class Job < Nucleon.plugin_class(:nucleon, :parallel_base)
     if initialized?
       success = true
 
+      dbg(id)
+
       execute_functions
       interpolate_parameters
 
       success = yield if block_given?
+      dbg(parameters)
     else
       success = false
     end
@@ -96,7 +99,7 @@ class Job < Nucleon.plugin_class(:nucleon, :parallel_base)
 
   def execute_functions
     execute_value = lambda do |value|
-      if match = value.match(/\<\<([^\>]+)\>\>/)
+      if value.is_a?(String) && match = value.match(/\<\<([^\>]+)\>\>/)
         match.captures.each do |function_id|
           function_components = function_id.split(':')
           function_provider = function_components.shift
@@ -136,7 +139,7 @@ class Job < Nucleon.plugin_class(:nucleon, :parallel_base)
     interpolate_value = lambda do |base_config, name, value|
       interpolations = false
       sequence.tokens.each do |token_name, token_value|
-        if value.gsub!(/\{\{#{token_name}\}\}/, token_value.to_s)
+        if value.is_a?(String) && value.gsub!(/\{\{#{token_name}\}\}/, token_value.to_s)
           interpolations = true
         end
       end
