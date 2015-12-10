@@ -87,20 +87,20 @@ class Sequence < Nucleon.plugin_class(:nucleon, :parallel_base)
   # Utilities
 
   def create_sequence(jobs)
-    CM.sequence({ :settings => settings, :jobs => jobs }, get(:sequence_provider, :default))
+    CM.sequence({ :settings => settings, :jobs => jobs, :new => true }, get(:sequence_provider, :default))
   end
 
   #---
 
   def create_batch(jobs)
-    CM.batch({ :sequence => myself, :jobs => jobs }, get(:batch_provider, :celluloid))
+    CM.batch({ :sequence => myself, :jobs => jobs, :new => true }, get(:batch_provider, :celluloid))
   end
 
   #---
 
   def create_job(settings)
     settings[:type] ||= get(:default_job_provider, :variables)
-    CM.job({ :settings => settings }, settings[:type])
+    CM.job({ :sequence => myself, :settings => settings, :new => true }, settings[:type])
   end
 end
 end
