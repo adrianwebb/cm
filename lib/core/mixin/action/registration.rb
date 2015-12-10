@@ -104,7 +104,7 @@ module Registration
   #---
 
   def register_job_provider(name, default = nil, locale = nil, &code)
-    register_plugin_provider(:CM, :jobch, name.to_sym, default, locale, &code)
+    register_plugin_provider(:CM, :job, name.to_sym, default, locale, &code)
   end
 
   #---
@@ -123,6 +123,30 @@ module Registration
 
   def register_jobs(name, default = nil, locale = nil, &code)
     register_plugins(:CM, :job, name.to_sym, default, locale, &code)
+  end
+
+  #---
+
+  def register_function_provider(name, default = nil, locale = nil, &code)
+    register_plugin_provider(:CM, :function, name.to_sym, default, locale, &code)
+  end
+
+  #---
+
+  def register_function_providers(name, default = nil, locale = nil, &code)
+    register_plugin_providers(:CM, :function, name.to_sym, default, locale, &code)
+  end
+
+  #---
+
+  def register_function(name, default = nil, locale = nil, &code)
+    register_plugin(:CM, :function, name.to_sym, default, locale, &code)
+  end
+
+  #---
+
+  def register_functions(name, default = nil, locale = nil, &code)
+    register_plugins(:CM, :function, name.to_sym, default, locale, &code)
   end
 end
 end
