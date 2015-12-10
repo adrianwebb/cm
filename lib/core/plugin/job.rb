@@ -12,6 +12,9 @@ class Job < Nucleon.plugin_class(:nucleon, :parallel_base)
 
   def normalize(reload)
     super
+
+    @sequence = delete(:sequence, nil)
+
     yield if block_given?
   end
 
@@ -25,10 +28,20 @@ class Job < Nucleon.plugin_class(:nucleon, :parallel_base)
   #-----------------------------------------------------------------------------
   # Property accessors / modifiers
 
+  def sequence
+    @sequence
+  end
+
+  #---
+
+  def settings
+    get_hash(:settings)
+  end
+
   #-----------------------------------------------------------------------------
   # Operations
 
-  def execute(settings)
+  def execute
     if initialized?
       success = true
       success = yield if block_given?
