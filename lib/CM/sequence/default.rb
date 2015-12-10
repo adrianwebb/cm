@@ -23,7 +23,7 @@ class Default < Nucleon.plugin_class(:CM, :sequence)
   def forward(options)
     super do |config, success|
       jobs.each do |job|
-        success = false unless job.execute(settings)
+        success = false unless job.execute
       end
       success
     end
@@ -34,7 +34,7 @@ class Default < Nucleon.plugin_class(:CM, :sequence)
   def reverse(options)
     super do |config, success|
       jobs.reverse.each do |job|
-        success = false unless job.execute(settings)
+        success = false unless job.execute
       end
       success
     end

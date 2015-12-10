@@ -1,7 +1,7 @@
 
 module CM
 module Job
-class Keypair < Nucleon.plugin_class(:CM, :job)
+class MicroBOSH < Nucleon.plugin_class(:CM, :job)
 
   #-----------------------------------------------------------------------------
   # Plugin interface

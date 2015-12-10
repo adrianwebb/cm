@@ -24,6 +24,12 @@ class Concourse < Nucleon.plugin_class(:CM, :job)
   #-----------------------------------------------------------------------------
   # Operations
 
+  def execute
+    super do
+      success = true
+    end
+  end
+
   #-----------------------------------------------------------------------------
   # Utilities
 

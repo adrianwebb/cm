@@ -27,7 +27,7 @@ class Celluloid < Nucleon.plugin_class(:CM, :batch)
     values = []
     jobs.each do |job|
       values << Celluloid::Future.new(job) do
-        job.execute(sequence.settings)
+        job.execute
       end
     end
     values = values.map { |future| future.value }
