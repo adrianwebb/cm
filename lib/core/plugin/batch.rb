@@ -87,6 +87,7 @@ class Batch < Nucleon.plugin_class(:nucleon, :parallel_base)
     success = true
     jobs.each do |job|
       success = false unless job.execute
+      break if sequence.trap && sequence.step
     end
     success
   end
