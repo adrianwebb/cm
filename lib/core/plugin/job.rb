@@ -155,7 +155,7 @@ class Job < Nucleon.plugin_class(:nucleon, :parallel_base)
           interpolations = true if interpolate.call(value)
         elsif value.is_a?(Array)
           value.each_with_index do |item, index|
-            interpolations = true if interpolate_value.call(settings, index, item)
+            interpolations = true if interpolate_value.call(settings[name], index, item)
           end
         else
           interpolations = true if interpolate_value.call(settings, name, value)
