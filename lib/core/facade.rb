@@ -62,5 +62,15 @@ module Facade
   def jobs(data, build_hash = false, keep_array = false)
     Nucleon.plugins(:CM, :job, data, build_hash, keep_array)
   end
+
+  #---
+
+  def function(options, provider = nil)
+    Nucleon.plugin(:CM, :function, provider, options)
+  end
+
+  def functions(data, build_hash = false, keep_array = false)
+    Nucleon.plugins(:CM, :function, data, build_hash, keep_array)
+  end
 end
 end
