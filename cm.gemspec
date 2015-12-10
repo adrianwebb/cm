@@ -11,7 +11,7 @@ Gem::Specification.new do |s|
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.require_paths = ["lib"]
   s.authors = ["Adrian Webb"]
-  s.date = "2015-12-09"
+  s.date = "2015-12-10"
   s.description = "\nPluggable cloud management framework that provides a simple foundation for\ndeploying and destroying enterprise ready cloud environments and components\nthat integrate; cloud provider components and services, cloud orchestration\nand configuration management tools, and continuous integration and delivery\npipelines.\n"
   s.email = "adrian.webb@gsa.gov"
   s.executables = ["cm"]
@@ -29,8 +29,10 @@ Gem::Specification.new do |s|
     "lib/CM/batch/celluloid.rb",
     "lib/CM/configuration/directory.rb",
     "lib/CM/configuration/file.rb",
+    "lib/CM/function/generate_password.rb",
     "lib/CM/job/AWS.rb",
     "lib/CM/job/BOSH.rb",
+    "lib/CM/job/MicroBOSH.rb",
     "lib/CM/job/concourse.rb",
     "lib/CM/job/keypair.rb",
     "lib/CM/job/variables.rb",
@@ -46,6 +48,7 @@ Gem::Specification.new do |s|
     "lib/core/plugin/cm_action.rb",
     "lib/core/plugin/configuration.rb",
     "lib/core/plugin/disk_configuration.rb",
+    "lib/core/plugin/function.rb",
     "lib/core/plugin/job.rb",
     "lib/core/plugin/parallel_base.rb",
     "lib/core/plugin/plan.rb",
