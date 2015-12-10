@@ -140,7 +140,8 @@ class Plan < Nucleon.plugin_class(:CM, :disk_configuration)
       # Initialize job sequence
       @sequence = CM.sequence({
         :jobs => manifest_jobs,
-        :settings => manifest_config
+        :settings => manifest_config,
+        :trap => _get(:trap, false)
       }, _get(:sequence_provider, :default))
 
       yield if block_given?
