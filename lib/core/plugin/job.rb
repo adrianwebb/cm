@@ -17,9 +17,34 @@ class Job < Nucleon.plugin_class(:nucleon, :parallel_base)
   def normalize(reload)
     super
 
-    @sequence = delete(:sequence, nil)
+    unless reload
+      @sequence = delete(:sequence, nil)
+      init_tokens if sequence
+    end
 
     yield if block_given?
+  end
+
+  #---
+
+  def init_tokens
+    @tokens = {}
+
+    collect_tokens = lambda do |local_settings, token|
+      local_settings.each do |name, value|
+        setting_token = [ array(token), name ].flatten
+
+        if value.is_a?(Hash)
+          collect_tokens.call(value, setting_token)
+        else
+          token_base = setting_token.shift
+          sequence.set_token(token_base, setting_token, value)
+        end
+      end
+    end
+
+    # Generate parameter tokens
+    collect_tokens.call(settings[:parameters], id)
   end
 
   #-----------------------------------------------------------------------------
