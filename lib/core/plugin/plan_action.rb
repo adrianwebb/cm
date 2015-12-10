@@ -43,6 +43,7 @@ class PlanAction < Nucleon.plugin_class(:nucleon, :cm_action)
         'cm.action.plan.base.options.key_path',
         'cm.action.plan.base.errors.key_path'
       ]
+      register_bool :trap, false, 'cm.action.plan.options.trap'
 
       project_config
 
@@ -77,7 +78,8 @@ class PlanAction < Nucleon.plugin_class(:nucleon, :cm_action)
       :manifest_file    => settings[:manifest],
       :project_provider => settings[:project_provider],
       :url              => settings[:project_reference],
-      :revision         => settings[:project_revision]
+      :revision         => settings[:project_revision],
+      :trap             => settings[:trap]
     }), settings[:plan_provider])
   end
 end
