@@ -100,7 +100,7 @@ class Sequence < Nucleon.plugin_class(:nucleon, :parallel_base)
 
   def create_job(settings)
     settings[:type] ||= get(:default_job_provider, :variables)
-    CM.job({ :sequence => myself, :settings => settings, :new => true }, settings[:type])
+    CM.job({ :sequence => myself, :settings => settings, :id => settings[:name] }, settings[:type])
   end
 end
 end
