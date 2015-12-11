@@ -17,7 +17,7 @@ class Job < Nucleon.plugin_class(:nucleon, :parallel_base)
   def normalize(reload)
     super
 
-    @sequence = delete(:sequence, nil) unless reload
+    @plan = delete(:plan, nil) unless reload
 
     yield if block_given?
   end
@@ -25,8 +25,6 @@ class Job < Nucleon.plugin_class(:nucleon, :parallel_base)
   #---
 
   def init_tokens
-    @tokens = {}
-
     collect_tokens = lambda do |local_settings, token|
       local_settings.each do |name, value|
         setting_token = [ array(token), name ].flatten
@@ -35,7 +33,7 @@ class Job < Nucleon.plugin_class(:nucleon, :parallel_base)
           collect_tokens.call(value, setting_token)
         else
           token_base = setting_token.shift
-          sequence.set_token(token_base, setting_token, value)
+          plan.set_token(token_base, setting_token, value)
         end
       end
     end
@@ -54,8 +52,8 @@ class Job < Nucleon.plugin_class(:nucleon, :parallel_base)
   #-----------------------------------------------------------------------------
   # Property accessors / modifiers
 
-  def sequence
-    @sequence
+  def plan
+    @plan
   end
 
   #---
@@ -135,7 +133,7 @@ class Job < Nucleon.plugin_class(:nucleon, :parallel_base)
   def interpolate_parameters
     interpolate_value = lambda do |base_config, name, value|
       interpolations = false
-      sequence.tokens.each do |token_name, token_value|
+      plan.tokens.each do |token_name, token_value|
         if value.is_a?(String) && value.gsub!(/\{\{#{token_name}\}\}/, token_value.to_s)
           interpolations = true
         end

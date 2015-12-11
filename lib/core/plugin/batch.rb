@@ -13,7 +13,7 @@ class Batch < Nucleon.plugin_class(:nucleon, :parallel_base)
   def normalize(reload)
     super
 
-    @sequence = delete(:sequence, nil)
+    @plan = delete(:plan, nil) unless reload
 
     init_jobs
     yield if block_given?
@@ -25,9 +25,9 @@ class Batch < Nucleon.plugin_class(:nucleon, :parallel_base)
     @jobs = []
     get_array(:jobs).each do |job_config|
       if job_config.has_key?(:sequence) # Array
-        @jobs << sequence.create_sequence(job_config[:sequence])
+        @jobs << plan.create_sequence(job_config[:sequence])
       else # Atomic
-        @jobs << sequence.create_job(job_config)
+        @jobs << plan.create_job(job_config)
       end
     end
     @jobs
@@ -43,8 +43,8 @@ class Batch < Nucleon.plugin_class(:nucleon, :parallel_base)
   #-----------------------------------------------------------------------------
   # Property accessors / modifiers
 
-  def sequence
-    @sequence
+  def plan
+    @plan
   end
 
   #---
@@ -87,7 +87,7 @@ class Batch < Nucleon.plugin_class(:nucleon, :parallel_base)
     success = true
     jobs.each do |job|
       success = false unless job.execute
-      break if sequence.trap && sequence.step
+      break if plan.trap && plan.step
     end
     success
   end

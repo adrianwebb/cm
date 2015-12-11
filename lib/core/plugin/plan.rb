@@ -39,6 +39,28 @@ class Plan < Nucleon.plugin_class(:CM, :disk_configuration)
     end
   end
 
+  #---
+
+  def init_tokens
+    clear_tokens
+
+    collect_tokens = lambda do |local_settings, token|
+      local_settings.each do |name, value|
+        setting_token = [ array(token), name ].flatten
+
+        if value.is_a?(Hash)
+          collect_tokens.call(value, setting_token)
+        else
+          token_base = setting_token.shift
+          set_token(token_base, setting_token, value)
+        end
+      end
+    end
+
+    # Generate config tokens
+    collect_tokens.call(manifest_config, 'config')
+  end
+
   #-----------------------------------------------------------------------------
   # Checks
 
@@ -120,6 +142,30 @@ class Plan < Nucleon.plugin_class(:CM, :disk_configuration)
     @sequence
   end
 
+  #---
+
+  def tokens
+    @tokens
+  end
+
+  def set_token(id, location, value)
+    @tokens["#{id}:#{array(location).join('.')}"] = value
+  end
+
+  def remove_token(id, location)
+    @tokens.delete("#{id}:#{array(location).join('.')}")
+  end
+
+  def clear_tokens
+    @tokens = {}
+  end
+
+  #---
+
+  def trap
+    _get(:trap, false)
+  end
+
   #-----------------------------------------------------------------------------
   # Operations
 
@@ -138,11 +184,7 @@ class Plan < Nucleon.plugin_class(:CM, :disk_configuration)
       override(loaded_config.get_hash(:config), :config)
 
       # Initialize job sequence
-      @sequence = CM.sequence({
-        :jobs => manifest_jobs,
-        :settings => manifest_config,
-        :trap => _get(:trap, false)
-      }, _get(:sequence_provider, :default))
+      @sequence = create_sequence(manifest_jobs)
 
       yield if block_given?
     end
@@ -157,7 +199,11 @@ class Plan < Nucleon.plugin_class(:CM, :disk_configuration)
     if initialized?
       if ::File.exist?(manifest_path)
         method = "operation_#{operation}"
-        success = send(method, options) if respond_to?(method) && load
+
+        if respond_to?(method) && load
+          init_tokens
+          success = send(method, options)
+        end
         success = save if success
         success
       else
@@ -193,6 +239,42 @@ class Plan < Nucleon.plugin_class(:CM, :disk_configuration)
   #-----------------------------------------------------------------------------
   # Utilities
 
+  def create_sequence(jobs)
+    CM.sequence({
+      :plan => myself,
+      :settings => manifest_config,
+      :jobs => jobs,
+      :new => true,
+    }, _get(:sequence_provider, :default))
+  end
+
+  #---
+
+  def create_batch(jobs)
+    CM.batch({
+      :plan => myself,
+      :jobs => jobs,
+      :new => true
+    }, _get(:batch_provider, :celluloid))
+  end
+
+  #---
+
+  def create_job(settings)
+    settings[:type] ||= _get(:default_job_provider, :variables)
+    CM.job({
+      :plan => myself,
+      :settings => settings,
+      :id => settings[:name]
+    }, settings[:type])
+  end
+
+  #---
+
+  def step
+    answer = ask('Continue? (yes|no): ', { :i18n => false })
+    answer.match(/^[Yy][Ee][Ss]$/) ? false : true
+  end
 end
 end
 end

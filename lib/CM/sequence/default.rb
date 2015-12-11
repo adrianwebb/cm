@@ -24,7 +24,7 @@ class Default < Nucleon.plugin_class(:CM, :sequence)
     super do |config, success|
       jobs.each do |job|
         success = false unless job.execute
-        break if trap && step
+        break if plan.trap && plan.step
       end
       success
     end
@@ -36,7 +36,7 @@ class Default < Nucleon.plugin_class(:CM, :sequence)
     super do |config, success|
       jobs.reverse.each do |job|
         success = false unless job.execute
-        break if trap && step
+        break if plan.trap && plan.step
       end
       success
     end
