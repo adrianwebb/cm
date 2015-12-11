@@ -81,13 +81,10 @@ class Job < Nucleon.plugin_class(:nucleon, :parallel_base)
     if initialized?
       success = true
 
-      dbg(id)
-
       execute_functions
       interpolate_parameters
 
       success = yield if block_given?
-      dbg(parameters)
     else
       success = false
     end
@@ -150,15 +147,21 @@ class Job < Nucleon.plugin_class(:nucleon, :parallel_base)
     interpolate = lambda do |settings|
       interpolations = false
 
-      settings.each do |name, value|
-        if value.is_a?(Hash)
-          interpolations = true if interpolate.call(value)
-        elsif value.is_a?(Array)
-          value.each_with_index do |item, index|
-            interpolations = true if interpolate_value.call(settings[name], index, item)
+      if settings.is_a?(Hash)
+        settings.each do |name, value|
+          if value.is_a?(Hash) || value.is_a?(Array)
+            interpolations = true if interpolate.call(value)
+          else
+            interpolations = true if interpolate_value.call(settings, name, value)
           end
-        else
-          interpolations = true if interpolate_value.call(settings, name, value)
+        end
+      elsif settings.is_a?(Array)
+        settings.each_with_index do |value, index|
+          if value.is_a?(Hash) || value.is_a?(Array)
+            interpolations = true if interpolate.call(value)
+          else
+            interpolations = true if interpolate_value.call(settings, index, value)
+          end
         end
       end
       interpolations
