@@ -26,7 +26,11 @@ GEM
     descendants_tracker (0.0.4)
       thread_safe (~> 0.3, >= 0.3.1)
     diff-lcs (1.2.5)
+    docker-api (1.24.1)
+      excon (>= 0.38.0)
+      json
     erubis (2.7.0)
+    excon (0.45.4)
     faraday (0.9.2)
       multipart-post (>= 1.2, < 3)
     ffi (1.9.10)
@@ -114,6 +118,7 @@ PLATFORMS
 
 DEPENDENCIES
   bundler (~> 1.10)
+  docker-api (~> 1.24)
   jeweler (~> 2.0)
   nucleon (~> 0.2)
   rdoc (~> 4.2)
