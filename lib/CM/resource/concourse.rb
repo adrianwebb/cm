@@ -1,7 +1,7 @@
 
 module CM
-module Job
-class AWS < Nucleon.plugin_class(:CM, :job)
+module Resource
+class Concourse < Nucleon.plugin_class(:CM, :resource)
 
   #-----------------------------------------------------------------------------
   # Plugin interface

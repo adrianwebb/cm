@@ -23,6 +23,14 @@ en:
         config_file: |-
           Failed to parse the execution plan manifest %{file}
   cm:
+    resource:
+      docker:
+        info:
+          no_credentials: |-
+            No Docker registry credentials supplied.  Required options: %{username_option}, %{password_option}, and %{email_option}
+        error:
+          container_failed: |-
+            Docker %{image} container for %{command} from creation failed
     action:
       plan:
         base:

@@ -5,7 +5,7 @@ nucleon_require(File.dirname(__FILE__), :parallel_base)
 
 module CM
 module Plugin
-class Job < Nucleon.plugin_class(:nucleon, :parallel_base)
+class Resource < Nucleon.plugin_class(:nucleon, :parallel_base)
 
   def self.register_ids
     [ :id ]

@@ -1,7 +1,7 @@
 
 module CM
-module Job
-class BOSH < Nucleon.plugin_class(:CM, :job)
+module Resource
+class AWS < Nucleon.plugin_class(:CM, :resource)
 
   #-----------------------------------------------------------------------------
   # Plugin interface

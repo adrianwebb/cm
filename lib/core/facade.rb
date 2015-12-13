@@ -55,12 +55,12 @@ module Facade
 
   #---
 
-  def job(options, provider = nil)
-    Nucleon.plugin(:CM, :job, provider, options)
+  def resource(options, provider = nil)
+    Nucleon.plugin(:CM, :resource, provider, options)
   end
 
-  def jobs(data, build_hash = false, keep_array = false)
-    Nucleon.plugins(:CM, :job, data, build_hash, keep_array)
+  def resources(data, build_hash = false, keep_array = false)
+    Nucleon.plugins(:CM, :resource, data, build_hash, keep_array)
   end
 
   #---

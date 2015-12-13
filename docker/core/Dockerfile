@@ -1,6 +1,6 @@
 # VERSION         0.1.0
 # DOCKER-VERSION  1.7.1
-# DESCRIPTION:    CM Base Job Image
+# DESCRIPTION:    CM Base Resource Image
 # TO_BUILD:       tar -czh . | docker build -t cm/core -
 # TO_RUN:         docker run cm/core cm --version
 

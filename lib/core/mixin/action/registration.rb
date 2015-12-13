@@ -103,26 +103,26 @@ module Registration
 
   #---
 
-  def register_job_provider(name, default = nil, locale = nil, &code)
-    register_plugin_provider(:CM, :job, name.to_sym, default, locale, &code)
+  def register_resource_provider(name, default = nil, locale = nil, &code)
+    register_plugin_provider(:CM, :resource, name.to_sym, default, locale, &code)
   end
 
   #---
 
-  def register_job_providers(name, default = nil, locale = nil, &code)
-    register_plugin_providers(:CM, :job, name.to_sym, default, locale, &code)
+  def register_resource_providers(name, default = nil, locale = nil, &code)
+    register_plugin_providers(:CM, :resource, name.to_sym, default, locale, &code)
   end
 
   #---
 
-  def register_job(name, default = nil, locale = nil, &code)
-    register_plugin(:CM, :job, name.to_sym, default, locale, &code)
+  def register_resource(name, default = nil, locale = nil, &code)
+    register_plugin(:CM, :resource, name.to_sym, default, locale, &code)
   end
 
   #---
 
-  def register_jobs(name, default = nil, locale = nil, &code)
-    register_plugins(:CM, :job, name.to_sym, default, locale, &code)
+  def register_resources(name, default = nil, locale = nil, &code)
+    register_plugins(:CM, :resource, name.to_sym, default, locale, &code)
   end
 
   #---

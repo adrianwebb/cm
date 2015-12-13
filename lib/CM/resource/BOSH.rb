@@ -1,7 +1,7 @@
 
 module CM
-module Job
-class Keypair < Nucleon.plugin_class(:CM, :job)
+module Resource
+class BOSH < Nucleon.plugin_class(:CM, :resource)
 
   #-----------------------------------------------------------------------------
   # Plugin interface

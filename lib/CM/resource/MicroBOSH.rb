@@ -1,7 +1,7 @@
 
 module CM
-module Job
-class Variables < Nucleon.plugin_class(:CM, :job)
+module Resource
+class MicroBOSH < Nucleon.plugin_class(:CM, :docker_resource)
 
   #-----------------------------------------------------------------------------
   # Plugin interface
@@ -13,6 +13,10 @@ class Variables < Nucleon.plugin_class(:CM, :job)
 
   #-----------------------------------------------------------------------------
   # Checks
+
+  def initialized?(options = {})
+    true
+  end
 
   #-----------------------------------------------------------------------------
   # Property accessors / modifiers

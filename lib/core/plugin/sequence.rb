@@ -15,29 +15,29 @@ class Sequence < Nucleon.plugin_class(:nucleon, :parallel_base)
 
     @plan = delete(:plan, nil) unless reload
 
-    init_jobs
+    init_resources
     yield if block_given?
   end
 
   #---
 
-  def init_jobs
-    @jobs = []
-    get_array(:jobs).each do |job_config|
-      if job_config.has_key?(:aggregate) # Array
-        @jobs << plan.create_batch(job_config[:aggregate])
+  def init_resources
+    @resources = []
+    get_array(:resources).each do |resource_config|
+      if resource_config.has_key?(:aggregate) # Array
+        @resources << plan.create_batch(resource_config[:aggregate])
       else # Atomic
-        @jobs << plan.create_job(job_config)
+        @resources << plan.create_resource(resource_config)
       end
     end
-    @jobs
+    @resources
   end
 
   #-----------------------------------------------------------------------------
   # Checks
 
   def initialized?(options = {})
-    !@jobs.empty?
+    !@resources.empty?
   end
 
   #-----------------------------------------------------------------------------
@@ -55,13 +55,13 @@ class Sequence < Nucleon.plugin_class(:nucleon, :parallel_base)
 
   #---
 
-  def jobs
-    @jobs
+  def resources
+    @resources
   end
 
-  def jobs=jobs
-    set(:jobs, Nucleon::Util::Data.array(jobs))
-    init_jobs
+  def resources=resources
+    set(:resources, Nucleon::Util::Data.array(resources))
+    init_resources
   end
 
   #-----------------------------------------------------------------------------

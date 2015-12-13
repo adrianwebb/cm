@@ -1,18 +1,12 @@
 
-nucleon_require(File.dirname(__FILE__), :job)
-
-#---
-
 module CM
-module Plugin
-class DockerJob < Nucleon.plugin_class(:CM, :job)
+module Resource
+class Keypair < Nucleon.plugin_class(:CM, :resource)
 
   #-----------------------------------------------------------------------------
   # Plugin interface
 
   def normalize(reload)
-    require 'docker'
-
     super
     yield if block_given?
   end
@@ -27,22 +21,12 @@ class DockerJob < Nucleon.plugin_class(:CM, :job)
   #-----------------------------------------------------------------------------
   # Property accessors / modifiers
 
-  def image
-    settings[:image]
-  end
-
-  def image=image
-    settings[:image] = image
-  end
-
   #-----------------------------------------------------------------------------
   # Operations
 
   def execute
     super do
       success = true
-      success = yield if block_given?
-      success
     end
   end
 

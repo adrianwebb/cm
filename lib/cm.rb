@@ -107,7 +107,7 @@ module CM
         :configuration => :file,     # Component and manifest storage
         :sequence      => :default,  # Event sequence
         :batch         => :celluloid,# Batch processor
-        :job           => :variables,# Individual job
+        :resource      => :variables,# Individual resource
         :function      => nil        # Configuration processing function
       }
     end

@@ -107,8 +107,8 @@ class Plan < Nucleon.plugin_class(:CM, :disk_configuration)
     get_hash(:config)
   end
 
-  def manifest_jobs
-    get_array(:jobs)
+  def manifest_resources
+    get_array(:resources)
   end
 
   #---
@@ -173,7 +173,7 @@ class Plan < Nucleon.plugin_class(:CM, :disk_configuration)
     success = true
 
     if initialized?
-      # Initialize plan manifest (default config and jobs)
+      # Initialize plan manifest (default config and resources)
       wipe
       import(CM.configuration(extended_config(:manifest_data, {
         :provider => _get(:manifest_provider, :file),
@@ -183,8 +183,8 @@ class Plan < Nucleon.plugin_class(:CM, :disk_configuration)
       # Merge in configuration overlay (private config)
       override(loaded_config.get_hash(:config), :config)
 
-      # Initialize job sequence
-      @sequence = create_sequence(manifest_jobs)
+      # Initializeresource sequence
+      @sequence = create_sequence(manifest_resources)
 
       yield if block_given?
     end
@@ -239,30 +239,30 @@ class Plan < Nucleon.plugin_class(:CM, :disk_configuration)
   #-----------------------------------------------------------------------------
   # Utilities
 
-  def create_sequence(jobs)
+  def create_sequence(resources)
     CM.sequence({
       :plan => myself,
       :settings => manifest_config,
-      :jobs => jobs,
+      :resources => resources,
       :new => true,
     }, _get(:sequence_provider, :default))
   end
 
   #---
 
-  def create_batch(jobs)
+  def create_batch(resources)
     CM.batch({
       :plan => myself,
-      :jobs => jobs,
+      :resources => resources,
       :new => true
     }, _get(:batch_provider, :celluloid))
   end
 
   #---
 
-  def create_job(settings)
-    settings[:type] ||= _get(:default_job_provider, :variables)
-    CM.job({
+  def create_resource(settings)
+    settings[:type] ||= _get(:default_resource_provider, :variables)
+    CM.resource({
       :plan => myself,
       :settings => settings,
       :id => settings[:name]

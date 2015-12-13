@@ -22,8 +22,8 @@ class Default < Nucleon.plugin_class(:CM, :sequence)
 
   def forward(options)
     super do |config, success|
-      jobs.each do |job|
-        success = false unless job.execute
+      resources.each do |resource|
+        success = false unless resource.execute
         break if plan.trap && plan.step
       end
       success
@@ -34,8 +34,8 @@ class Default < Nucleon.plugin_class(:CM, :sequence)
 
   def reverse(options)
     super do |config, success|
-      jobs.reverse.each do |job|
-        success = false unless job.execute
+      resources.reverse.each do |resource|
+        success = false unless resource.execute
         break if plan.trap && plan.step
       end
       success

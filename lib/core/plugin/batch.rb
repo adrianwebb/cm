@@ -15,22 +15,22 @@ class Batch < Nucleon.plugin_class(:nucleon, :parallel_base)
 
     @plan = delete(:plan, nil) unless reload
 
-    init_jobs
+    init_resources
     yield if block_given?
   end
 
   #---
 
-  def init_jobs
-    @jobs = []
-    get_array(:jobs).each do |job_config|
-      if job_config.has_key?(:sequence) # Array
-        @jobs << plan.create_sequence(job_config[:sequence])
+  def init_resources
+    @resources = []
+    get_array(:resources).each do |resource_config|
+      if resource_config.has_key?(:sequence) # Array
+        @resources << plan.create_sequence(resource_config[:sequence])
       else # Atomic
-        @jobs << plan.create_job(job_config)
+        @resources << plan.create_resource(resource_config)
       end
     end
-    @jobs
+    @resources
   end
 
   #-----------------------------------------------------------------------------
@@ -49,13 +49,13 @@ class Batch < Nucleon.plugin_class(:nucleon, :parallel_base)
 
   #---
 
-  def jobs
-    @jobs
+  def resources
+    @resources
   end
 
-  def jobs=jobs
-    set(:jobs, array(jobs))
-    init_jobs
+  def resources=resources
+    set(:resources, array(resources))
+    init_resources
   end
 
   #-----------------------------------------------------------------------------
@@ -85,8 +85,8 @@ class Batch < Nucleon.plugin_class(:nucleon, :parallel_base)
 
   def execute_sequence
     success = true
-    jobs.each do |job|
-      success = false unless job.execute
+    resources.each do |resource|
+      success = false unless resource.execute
       break if plan.trap && plan.step
     end
     success

@@ -11,7 +11,7 @@ Gem::Specification.new do |s|
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.require_paths = ["lib"]
   s.authors = ["Adrian Webb"]
-  s.date = "2015-12-11"
+  s.date = "2015-12-13"
   s.description = "\nPluggable cloud management framework that provides a simple foundation for\ndeploying and destroying enterprise ready cloud environments and components\nthat integrate; cloud provider components and services, cloud orchestration\nand configuration management tools, and continuous integration and delivery\npipelines.\n"
   s.email = "adrian.webb@gsa.gov"
   s.executables = ["cm"]
@@ -20,23 +20,25 @@ Gem::Specification.new do |s|
   ]
   s.files = [
     ".gitignore",
+    ".gitmodules",
     "Gemfile",
     "Gemfile.lock",
     "Rakefile",
     "VERSION",
     "bin/cm",
+    "bootstrap/lib/bash/LICENSE.txt",
     "cm.gemspec",
     "lib/CM/batch/celluloid.rb",
     "lib/CM/configuration/directory.rb",
     "lib/CM/configuration/file.rb",
     "lib/CM/function/generate_password.rb",
-    "lib/CM/job/AWS.rb",
-    "lib/CM/job/BOSH.rb",
-    "lib/CM/job/MicroBOSH.rb",
-    "lib/CM/job/concourse.rb",
-    "lib/CM/job/keypair.rb",
-    "lib/CM/job/variables.rb",
     "lib/CM/plan/default.rb",
+    "lib/CM/resource/AWS.rb",
+    "lib/CM/resource/BOSH.rb",
+    "lib/CM/resource/MicroBOSH.rb",
+    "lib/CM/resource/concourse.rb",
+    "lib/CM/resource/keypair.rb",
+    "lib/CM/resource/variables.rb",
     "lib/CM/sequence/default.rb",
     "lib/cm.rb",
     "lib/core/errors.rb",
@@ -44,16 +46,17 @@ Gem::Specification.new do |s|
     "lib/core/mixin/action/config.rb",
     "lib/core/mixin/action/registration.rb",
     "lib/core/overrides.rb",
+    "lib/core/plugin/auth_docker_resource.rb",
     "lib/core/plugin/batch.rb",
     "lib/core/plugin/cm_action.rb",
     "lib/core/plugin/configuration.rb",
     "lib/core/plugin/disk_configuration.rb",
-    "lib/core/plugin/docker_job.rb",
+    "lib/core/plugin/docker_resource.rb",
     "lib/core/plugin/function.rb",
-    "lib/core/plugin/job.rb",
     "lib/core/plugin/parallel_base.rb",
     "lib/core/plugin/plan.rb",
     "lib/core/plugin/plan_action.rb",
+    "lib/core/plugin/resource.rb",
     "lib/core/plugin/sequence.rb",
     "lib/nucleon/action/plan/deploy.rb",
     "lib/nucleon/action/plan/destroy.rb",
@@ -64,7 +67,7 @@ Gem::Specification.new do |s|
   s.licenses = ["Apache License, Version 2.0"]
   s.rdoc_options = ["--title", "CM (Cloud Manager)", "--main", "README.rdoc", "--line-numbers"]
   s.required_ruby_version = Gem::Requirement.new(">= 1.9.1")
-  s.rubygems_version = "2.4.8"
+  s.rubygems_version = "2.4.5"
   s.summary = "Pluggable cloud management framework that provides a simple foundation for deploying and destroying enterprise ready cloud environments and components"
 
   if s.respond_to? :specification_version then
