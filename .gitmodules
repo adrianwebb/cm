@@ -1,3 +1,0 @@
-[submodule "docker/bootstrap"]
-	path = docker/bootstrap
-	url = https://github.com/adrianwebb/cm-bootstrap.git
