@@ -75,18 +75,33 @@ class Resource < Nucleon.plugin_class(:nucleon, :parallel_base)
   #-----------------------------------------------------------------------------
   # Operations
 
-  def execute
+  def execute(operation)
     if initialized?
+      method = "operation_#{operation}"
       success = true
 
       execute_functions
       interpolate_parameters
 
-      success = yield if block_given?
+      if respond_to?(method)
+        success = send(method)
+      end
     else
       success = false
     end
     success
+  end
+
+  #---
+
+  def operation_deploy
+    yield if block_given?
+  end
+
+  #---
+
+  def operation_destroy
+    yield if block_given?
   end
 
   #-----------------------------------------------------------------------------
