@@ -61,12 +61,12 @@ class Batch < Nucleon.plugin_class(:nucleon, :parallel_base)
   #-----------------------------------------------------------------------------
   # Operations
 
-  def execute
+  def execute(operation)
     if initialized?
       if Nucleon.parallel?
-        success = execute_parallel
+        success = execute_parallel(operation)
       else
-        success = execute_sequence
+        success = execute_sequence(operation)
       end
     else
       success = false
@@ -77,16 +77,16 @@ class Batch < Nucleon.plugin_class(:nucleon, :parallel_base)
   #-----------------------------------------------------------------------------
   # Utilities
 
-  def execute_parallel
+  def execute_parallel(operation)
     false # Override me!!
   end
 
   #---
 
-  def execute_sequence
+  def execute_sequence(operation)
     success = true
     resources.each do |resource|
-      success = false unless resource.execute
+      success = false unless resource.execute(operation)
       break if plan.trap && plan.step
     end
     success
