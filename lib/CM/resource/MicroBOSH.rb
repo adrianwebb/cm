@@ -24,7 +24,7 @@ class MicroBOSH < Nucleon.plugin_class(:CM, :docker_resource)
   #-----------------------------------------------------------------------------
   # Operations
 
-  def execute
+  def execute(operation)
     super do
       success = true
     end

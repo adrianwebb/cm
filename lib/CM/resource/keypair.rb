@@ -24,7 +24,7 @@ class Keypair < Nucleon.plugin_class(:CM, :resource)
   #-----------------------------------------------------------------------------
   # Operations
 
-  def execute
+  def execute(operation)
     super do
       success = true
     end
