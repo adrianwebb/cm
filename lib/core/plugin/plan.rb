@@ -35,6 +35,11 @@ class Plan < Nucleon.plugin_class(:CM, :disk_configuration)
         :path => config_directory
       }))
 
+      @tokens = CM.configuration(extended_config(:token_data, {
+        :provider => _get(:token_provider, :file),
+        :path => token_path
+      }))
+
       yield if block_given?
     end
   end
@@ -117,14 +122,13 @@ class Plan < Nucleon.plugin_class(:CM, :disk_configuration)
     _get(:config_directory, path)
   end
 
-  def output_file
-    _get(:output_file, "rendered.#{manifest_file.gsub(/#{File::SEPARATOR}+/, '.')}")
+  def config_file
+    _get(:config_file, "full.#{manifest_file.gsub(/#{File::SEPARATOR}+/, '.')}")
   end
 
-  def target_path
-    ::File.join(config_directory, output_file)
+  def config_path
+    ::File.join(config_directory, config_file)
   end
-
 
   #---
 
@@ -144,20 +148,36 @@ class Plan < Nucleon.plugin_class(:CM, :disk_configuration)
 
   #---
 
+  def token_directory
+    _get(:token_directory, path)
+  end
+
+  def token_file
+    _get(:token_file, 'token.json')
+  end
+
+  def token_path
+    ::File.join(token_directory, token_file)
+  end
+
+  #---
+
   def tokens
-    @tokens
+    @tokens.parse
   end
 
   def set_token(id, location, value)
     @tokens["#{id}:#{array(location).join('.')}"] = value
+    @tokens.save
   end
 
   def remove_token(id, location)
     @tokens.delete("#{id}:#{array(location).join('.')}")
+    @tokens.save
   end
 
   def clear_tokens
-    @tokens = {}
+    @tokens.wipe
   end
 
   #---
@@ -220,20 +240,20 @@ class Plan < Nucleon.plugin_class(:CM, :disk_configuration)
 
   def operation_deploy(options)
     config = Nucleon::Config.ensure(options)
-    sequence.forward(config)
+    sequence.forward(:deploy, config)
   end
 
   #---
 
   def operation_destroy(options)
     config = Nucleon::Config.ensure(options)
-    sequence.reverse(config)
+    sequence.reverse(:destroy, config)
   end
 
   #---
 
   def save
-    save_config(target_path, { :config => manifest_config })
+    save_config(config_path, { :config => manifest_config })
   end
 
   #-----------------------------------------------------------------------------
