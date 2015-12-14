@@ -67,7 +67,7 @@ class Sequence < Nucleon.plugin_class(:nucleon, :parallel_base)
   #-----------------------------------------------------------------------------
   # Operations
 
-  def forward(options)
+  def forward(operation, options)
     config = Nucleon::Config.ensure(options)
 
     if initialized?
@@ -81,7 +81,7 @@ class Sequence < Nucleon.plugin_class(:nucleon, :parallel_base)
 
   #---
 
-  def reverse(options)
+  def reverse(operation, options)
     config = Nucleon::Config.ensure(options)
 
     if initialized?
