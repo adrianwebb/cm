@@ -3,6 +3,7 @@
 # DESCRIPTION:    CM Base Resource Image
 # TO_BUILD:       docker build -t cm/core .
 # TO_RUN:         docker run cm/core cm --version
+#                 docker run -i -t --entrypoint /bin/bash cm/core (SSH into)
 
 FROM ubuntu:14.04
 
@@ -11,8 +12,8 @@ ENV GEM_CM_DEV=1 GEM_CM_DIRECTORY=/opt/cm/core CM_CMD_VERSION=0.1.4
 COPY . /opt/cm/core
 WORKDIR /opt/cm/core/bootstrap
 
-RUN /bin/bash -l -c "/opt/cm/core/bootstrap/bootstrap.sh base"
-RUN /bin/bash -l -c "/opt/cm/core/bootstrap/bootstrap.sh git"
-RUN /bin/bash -l -c "/opt/cm/core/bootstrap/bootstrap.sh ruby"
-RUN /bin/bash -l -c "/opt/cm/core/bootstrap/bootstrap.sh cm"
-RUN /bin/bash -l -c "/opt/cm/core/bootstrap/bootstrap.sh test"
+RUN /bin/bash -c "./bootstrap.sh base"
+RUN /bin/bash -c "./bootstrap.sh git"
+RUN /bin/bash -c "./bootstrap.sh ruby"
+RUN /bin/bash -c "./bootstrap.sh cm"
+RUN /bin/bash -c "./bootstrap.sh test"
