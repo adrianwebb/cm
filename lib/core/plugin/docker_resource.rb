@@ -108,7 +108,6 @@ class DockerResource < Nucleon.plugin_class(:CM, :resource)
 
       # A fork in the road!
       if internal?
-        info("Yay!!! We are here", { :i18n => false })
         data = yield if block_given?
       else
         myself.value = action(plugin_provider, :deploy)
