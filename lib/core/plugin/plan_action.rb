@@ -49,7 +49,7 @@ class PlanAction < Nucleon.plugin_class(:nucleon, :cm_action)
         'cm.action.plan.base.options.token_path',
         'cm.action.plan.base.errors.token_path'
       ]
-      register_str :token_file, 'tokens.yaml', 'cm.action.plan.base.options.token_file'
+      register_str :token_file, 'tokens.json', 'cm.action.plan.base.options.token_file'
 
       register_directory :key_path, Dir.pwd, [
         'cm.action.plan.base.options.key_path',
