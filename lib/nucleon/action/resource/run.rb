@@ -41,9 +41,8 @@ class Run < Nucleon.plugin_class(:nucleon, :plan_action)
 
   def execute
     super do
-      success = true
-
-
+      resource = plan.create_resource(settings[:resource_config])
+      success  = resource.execute(settings[:operation])
 
       myself.status = code.run_failed unless success
     end
