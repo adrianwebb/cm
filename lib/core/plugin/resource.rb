@@ -72,6 +72,16 @@ class Resource < Nucleon.plugin_class(:nucleon, :parallel_base)
     hash(settings[:parameters])
   end
 
+  #---
+
+  def value
+    hash(@value)
+  end
+
+  def value=value
+    @value = hash(value)
+  end
+
   #-----------------------------------------------------------------------------
   # Operations
 
