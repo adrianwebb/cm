@@ -14,10 +14,6 @@ class File < Nucleon.plugin_class(:CM, :disk_configuration)
   #-----------------------------------------------------------------------------
   # Checks
 
-  def initialized?(options = {})
-    path && ::File.exist?(path)
-  end
-
   #-----------------------------------------------------------------------------
   # Property accessors / modifiers
 
