@@ -32,7 +32,7 @@ class Plan < Nucleon.plugin_class(:CM, :disk_configuration)
     if project && !reload
       @loaded_config = CM.configuration(extended_config(:config_data, {
         :provider => _get(:config_provider, :directory),
-        :path => config_directory
+        :path => config_path
       }))
 
       @tokens = CM.configuration(extended_config(:token_data, {
@@ -86,6 +86,12 @@ class Plan < Nucleon.plugin_class(:CM, :disk_configuration)
 
   #---
 
+  def action_settings
+    _get(:action_settings, {})
+  end
+
+  #---
+
   def path
     project.directory
   end
@@ -118,16 +124,8 @@ class Plan < Nucleon.plugin_class(:CM, :disk_configuration)
 
   #---
 
-  def config_directory
-    _get(:config_directory, path)
-  end
-
-  def config_file
-    _get(:config_file, "full.#{manifest_file.gsub(/#{File::SEPARATOR}+/, '.')}")
-  end
-
   def config_path
-    ::File.join(config_directory, config_file)
+    _get(:config_path, path)
   end
 
   #---
@@ -149,11 +147,11 @@ class Plan < Nucleon.plugin_class(:CM, :disk_configuration)
   #---
 
   def token_directory
-    _get(:token_directory, path)
+    _get(:token_directory, config_path)
   end
 
   def token_file
-    _get(:token_file, 'token.json')
+    _get(:token_file, 'tokens.json')
   end
 
   def token_path
@@ -213,7 +211,7 @@ class Plan < Nucleon.plugin_class(:CM, :disk_configuration)
 
   #---
 
-  def execute(operation, options = {})
+  def execute(operation)
     success = true
 
     if initialized?
@@ -222,9 +220,8 @@ class Plan < Nucleon.plugin_class(:CM, :disk_configuration)
 
         if respond_to?(method) && load
           init_tokens
-          success = send(method, options)
+          success = send(method)
         end
-        success = save if success
         success
       else
         error('manifest_file', { :file => manifest_path })
@@ -238,22 +235,14 @@ class Plan < Nucleon.plugin_class(:CM, :disk_configuration)
 
   #---
 
-  def operation_deploy(options)
-    config = Nucleon::Config.ensure(options)
-    sequence.forward(:deploy, config)
+  def operation_deploy
+    sequence.forward(:deploy)
   end
 
   #---
 
-  def operation_destroy(options)
-    config = Nucleon::Config.ensure(options)
-    sequence.reverse(:destroy, config)
-  end
-
-  #---
-
-  def save
-    save_config(config_path, { :config => manifest_config })
+  def operation_destroy
+    sequence.reverse(:destroy)
   end
 
   #-----------------------------------------------------------------------------
@@ -281,10 +270,12 @@ class Plan < Nucleon.plugin_class(:CM, :disk_configuration)
   #---
 
   def create_resource(settings)
+    settings = Nucleon::Config.ensure(settings)
     settings[:type] ||= _get(:default_resource_provider, :variables)
+
     CM.resource({
       :plan => myself,
-      :settings => settings,
+      :settings => settings.export,
       :id => settings[:name]
     }, settings[:type])
   end
