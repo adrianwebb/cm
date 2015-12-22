@@ -24,7 +24,15 @@ class AWS < Nucleon.plugin_class(:CM, :resource)
   #-----------------------------------------------------------------------------
   # Operations
 
-  def execute(operation)
+  def operation_deploy
+    super do
+      success = true
+    end
+  end
+
+  #---
+
+  def operation_destroy
     super do
       success = true
     end
