@@ -20,8 +20,8 @@ class Default < Nucleon.plugin_class(:CM, :sequence)
   #-----------------------------------------------------------------------------
   # Operations
 
-  def forward(operation, options)
-    super do |config, success|
+  def forward(operation)
+    super do |success|
       resources.each do |resource|
         success = false unless resource.execute(operation)
         break if plan.trap && plan.step
@@ -32,8 +32,8 @@ class Default < Nucleon.plugin_class(:CM, :sequence)
 
   #---
 
-  def reverse(operation, options)
-    super do |config, success|
+  def reverse(operation)
+    super do |success|
       resources.reverse.each do |resource|
         success = false unless resource.execute(operation)
         break if plan.trap && plan.step
