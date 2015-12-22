@@ -20,7 +20,7 @@ class DockerResource < Nucleon.plugin_class(:CM, :resource)
     settings[:docker_sock] ||= '/var/run/docker.sock'
     settings[:docker_host] ||= nil
     settings[:docker_port] ||= '127.0.0.1'
-    settings[:docker_image] ||= 'aweb/cm'
+    settings[:docker_image] ||= 'awebb/cm'
 
     if settings[:docker_host].nil?
       Docker.url = "#{settings[:docker_protocol]}://#{settings[:docker_sock]}"
@@ -75,14 +75,6 @@ class DockerResource < Nucleon.plugin_class(:CM, :resource)
     get(:plan_directory, '/opt/cm/volumes/plan')
   end
 
-  def config_directory
-    get(:config_directory, '/opt/cm/volumes/config')
-  end
-
-  def token_directory
-    get(:token_directory, '/opt/cm/volumes/token')
-  end
-
   def key_directory
     get(:key_directory, '/opt/cm/volumes/keys')
   end
@@ -119,10 +111,10 @@ class DockerResource < Nucleon.plugin_class(:CM, :resource)
         info("Yay!!! We are here", { :i18n => false })
         data = yield if block_given?
       else
-        data = action(plugin_provider, :deploy)
-        myself.status = code.docker_exec_failed unless data
+        myself.value = action(plugin_provider, :deploy)
+        myself.status = code.docker_exec_failed unless value
       end
-      data
+      value
     end
   end
 
@@ -132,7 +124,6 @@ class DockerResource < Nucleon.plugin_class(:CM, :resource)
   def exec(command)
     data = nil
 
-    FileUtils.mkdir_p(host_output_directory)
     create_container
 
     results = container.exec(['bash', '-l', '-c', command]) do |stream, message|
@@ -153,7 +144,6 @@ class DockerResource < Nucleon.plugin_class(:CM, :resource)
     end
 
     destroy_container
-    FileUtils.rm_rf(host_output_directory)
     data
   end
 
@@ -179,7 +169,13 @@ class DockerResource < Nucleon.plugin_class(:CM, :resource)
   #---
 
   def action(provider, operation)
-    encoded_config = Nucleon::Util::CLI.encode(Nucleon::Util::Data.clean(settings))
+    FileUtils.mkdir_p(host_input_directory)
+    FileUtils.mkdir_p(host_output_directory)
+
+    action_settings = Nucleon::Util::Data.clean(plan.action_settings)
+    initialize_remote_config(action_settings)
+
+    encoded_config = Nucleon::Util::CLI.encode(action_settings)
     action_config  = extended_config(:action, {
       :command => 'resource run',
       :data    => { :encoded  => encoded_config },
@@ -193,6 +189,9 @@ class DockerResource < Nucleon.plugin_class(:CM, :resource)
     })) do |stream, message|
       yield(stream, message) if block_given?
     end
+
+    FileUtils.rm_rf(host_input_directory)
+    FileUtils.rm_rf(host_output_directory)
     data
   end
 
@@ -215,23 +214,17 @@ class DockerResource < Nucleon.plugin_class(:CM, :resource)
       'Tty' => true,
       'Env' => container_env,
       'Volumes' => {
-        CM.config_path => {},
         plan_directory => {},
-        config_directory => {},
-        token_directory => {},
         key_directory => {},
         input_directory => {},
         output_directory => {}
       },
       'HostConfig' => {
         'Binds' => [
-          "#{CM.config_path}:#{CM.config_path}:ro",
-          "#{plan.path}:#{plan_directory}:ro",
-          "#{plan.config_directory}:#{config_directory}:ro",
-          "#{plan.token_directory}:#{token_directory}:rw",
+          "#{plan.path}:#{plan_directory}:rw",
           "#{plan.key_directory}:#{key_directory}:rw",
-          "#{host_input_directory}:#{input_directory}:ro",
-          "#{host_output_directory}:#{output_directory}:rw"
+          "#{host_input_directory}:#{input_directory}:ro", # config.yaml and tokens.json
+          "#{host_output_directory}:#{output_directory}:rw" # ??.yaml and/or ??.json
         ]
       }
     })
@@ -245,6 +238,52 @@ class DockerResource < Nucleon.plugin_class(:CM, :resource)
     end
   end
   protected :create_container
+
+  #---
+
+  def initialize_remote_config(action_settings)
+    # Generate action settings file
+    settings = CM.configuration(extended_config(:container_input_settings_data, {
+      :provider => get(:container_input_settings_provider, :file),
+      :path => "#{host_input_directory}/action_settings.json"
+    }))
+    settings.import(action_settings)
+    settings.save
+
+    Nucleon.remove_plugin(settings)
+
+    # Generate and store plan configuration in local input directory
+    config = CM.configuration(extended_config(:container_input_config_data, {
+      :provider => get(:container_input_config_provider, :file),
+      :path => "#{host_input_directory}/config.json"
+    }))
+    config.import(plan.manifest_config)
+    config.save
+
+    Nucleon.remove_plugin(config)
+
+    # Generate and store plan tokens in local input directory
+    tokens = CM.configuration(extended_config(:container_input_token_data, {
+      :provider => get(:container_input_token_provider, :file),
+      :path => "#{host_output_directory}/tokens.json"
+    }))
+    tokens.import(plan.tokens)
+    tokens.save
+
+    Nucleon.remove_plugin(tokens)
+
+    # Customize action settings
+    action_settings[:resource_config] = myself.settings
+    action_settings[:settings_path] = "#{input_directory}/action_settings.json"
+    action_settings[:plan_path] = plan_directory
+    action_settings[:config_provider] = 'file'
+    action_settings[:config_path] = "#{input_directory}/config.json"
+    action_settings[:token_provider] = 'file'
+    action_settings[:token_path] = output_directory
+    action_settings[:token_file] = 'tokens.json'
+    action_settings[:key_path] = key_directory
+  end
+  protected :initialize_remote_config
 
 
   #---
@@ -266,9 +305,9 @@ class DockerResource < Nucleon.plugin_class(:CM, :resource)
 
   def render_docker_message(stream, message)
     if stream == 'stderr'
-      warn(message, { :i18n => false })
+      puts message
     else
-      info(message, { :i18n => false })
+      puts message
     end
   end
 end
