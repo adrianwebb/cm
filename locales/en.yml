@@ -40,7 +40,7 @@ en:
             plan_path: |-
               File path to the root directory of the plan project
             config_path: |-
-              File path of the private configuration directory
+              File path of the private configurations
             key_path: |-
               File path of the SSH private key directory
             manifest: |-
@@ -50,8 +50,6 @@ en:
               Execution plan must be one of the following options: %{choices}
             plan_path: |-
               Plan top level directory  (%{directory}) does not exist or is not readable
-            config_path: |-
-              Plan configuration directory (%{directory}) does not exist or is not readable
             key_path: |-
               Private SSH key top level directory (%{directory}) does not exist or is not readable
             manifest: |-
