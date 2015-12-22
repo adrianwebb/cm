@@ -24,6 +24,8 @@ class Sequence < Nucleon.plugin_class(:nucleon, :parallel_base)
   def init_resources
     @resources = []
     get_array(:resources).each do |resource_config|
+      resource_config = Nucleon::Config.ensure(resource_config)
+
       if resource_config.has_key?(:aggregate) # Array
         @resources << plan.create_batch(resource_config[:aggregate])
       else # Atomic
@@ -67,12 +69,10 @@ class Sequence < Nucleon.plugin_class(:nucleon, :parallel_base)
   #-----------------------------------------------------------------------------
   # Operations
 
-  def forward(operation, options)
-    config = Nucleon::Config.ensure(options)
-
+  def forward(operation)
     if initialized?
       success = true
-      success = yield(config, success) if block_given?
+      success = yield(success) if block_given?
     else
       success = false
     end
@@ -81,12 +81,10 @@ class Sequence < Nucleon.plugin_class(:nucleon, :parallel_base)
 
   #---
 
-  def reverse(operation, options)
-    config = Nucleon::Config.ensure(options)
-
+  def reverse(operation)
     if initialized?
       success = true
-      success = yield(config, success) if block_given?
+      success = yield(success) if block_given?
     else
       success = false
     end
