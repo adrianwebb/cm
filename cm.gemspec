@@ -11,7 +11,7 @@ Gem::Specification.new do |s|
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.require_paths = ["lib"]
   s.authors = ["Adrian Webb"]
-  s.date = "2015-12-13"
+  s.date = "2015-12-22"
   s.description = "\nPluggable cloud management framework that provides a simple foundation for\ndeploying and destroying enterprise ready cloud environments and components\nthat integrate; cloud provider components and services, cloud orchestration\nand configuration management tools, and continuous integration and delivery\npipelines.\n"
   s.email = "adrian.webb@gsa.gov"
   s.executables = ["cm"]
@@ -60,6 +60,7 @@ Gem::Specification.new do |s|
     "lib/core/plugin/sequence.rb",
     "lib/nucleon/action/plan/deploy.rb",
     "lib/nucleon/action/plan/destroy.rb",
+    "lib/nucleon/action/resource/run.rb",
     "locales/en.yml",
     "spec/spec_helper.rb"
   ]
