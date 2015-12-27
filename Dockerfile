@@ -1,4 +1,4 @@
-# VERSION         0.1.0
+# VERSION         0.1.6
 # DOCKER-VERSION  1.7.1
 # DESCRIPTION:    CM Base Resource Image
 # TO_BUILD:       docker build -t cm/core .
