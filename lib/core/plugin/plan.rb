@@ -229,7 +229,6 @@ class Plan < Nucleon.plugin_class(:CM, :disk_configuration)
   def create_sequence(resources)
     CM.sequence({
       :plan => myself,
-      :settings => manifest_config,
       :resources => resources,
       :new => true,
     }, _get(:sequence_provider, :default))

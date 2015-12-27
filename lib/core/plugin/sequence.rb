@@ -48,7 +48,7 @@ class Sequence < Nucleon.plugin_class(:nucleon, :base)
   #---
 
   def settings
-    get_hash(:settings)
+    plan.manifest_config
   end
 
   #---
