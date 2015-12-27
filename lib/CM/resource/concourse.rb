@@ -1,7 +1,7 @@
 
 module CM
 module Resource
-class Concourse < Nucleon.plugin_class(:CM, :resource)
+class Concourse < Nucleon.plugin_class(:CM, :docker_resource)
 
   #-----------------------------------------------------------------------------
   # Plugin interface

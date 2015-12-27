@@ -1,7 +1,7 @@
 
 module CM
 module Resource
-class BOSH < Nucleon.plugin_class(:CM, :resource)
+class BOSH < Nucleon.plugin_class(:CM, :docker_resource)
 
   #-----------------------------------------------------------------------------
   # Plugin interface

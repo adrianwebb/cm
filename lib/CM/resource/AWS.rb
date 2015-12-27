@@ -1,7 +1,7 @@
 
 module CM
 module Resource
-class AWS < Nucleon.plugin_class(:CM, :resource)
+class AWS < Nucleon.plugin_class(:CM, :docker_resource)
 
   #-----------------------------------------------------------------------------
   # Plugin interface
