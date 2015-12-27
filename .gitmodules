@@ -1,3 +1,6 @@
 [submodule "bootstrap"]
 	path = bootstrap
 	url = https://github.com/adrianwebb/cm-bootstrap.git
+[submodule "toolbox"]
+	path = toolbox
+	url = https://github.com/coralnexus/coral-toolbox.git
