@@ -109,8 +109,13 @@ class DockerResource < Nucleon.plugin_class(:CM, :resource)
       # A fork in the road!
       if internal?
         data = yield if block_given?
+        logger.info("Docker internal data: #{hash(data)}")
       else
+        logger.info("Running deploy operation on #{plugin_provider} resource")
+
         data = action(plugin_provider, :deploy)
+        logger.info("Docker return data: #{hash(data)}")
+
         myself.status = code.docker_exec_failed unless data
       end
       myself.data = data
@@ -291,6 +296,7 @@ class DockerResource < Nucleon.plugin_class(:CM, :resource)
   def destroy_container
     containers = Docker::Container.all({ :all => 1 })
 
+    # TODO: Fix occasional crashed actor issue when in parallel mode
     containers.each do |cont|
       if cont.info.key?('Names') && cont.info['Names'].include?("/#{plugin_instance_name}")
         cont.kill!
@@ -305,9 +311,9 @@ class DockerResource < Nucleon.plugin_class(:CM, :resource)
 
   def render_docker_message(stream, message)
     if stream == 'stderr'
-      puts message
+      warn(message, { :i18n => false })
     else
-      puts message
+      info(message, { :i18n => false })
     end
   end
 end
