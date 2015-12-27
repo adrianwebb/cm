@@ -41,6 +41,7 @@ Vagrant.configure('2') do |config|
     end
 
     # Provisioning
+
     # Docker installation and image building
     node.vm.provision :docker do |provisioner|
       provisioner.build_image '/vagrant', args: '-t awebb/cm'
@@ -49,7 +50,7 @@ Vagrant.configure('2') do |config|
     # CM bootstrap
     node.vm.provision :shell do |shell|
       shell.path = 'bootstrap/bootstrap.sh'
-      shell.upload_path = '/vagrant/bootstrap'
+      shell.upload_path = '/vagrant/bootstrap/bootstrap.sh'
       shell.privileged = true
       shell.env = {
         'GEM_CM_DEV' => '1',
