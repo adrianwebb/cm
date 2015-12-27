@@ -1,11 +1,7 @@
 
-nucleon_require(File.dirname(__FILE__), :parallel_base)
-
-#---
-
 module CM
 module Plugin
-class Resource < Nucleon.plugin_class(:nucleon, :parallel_base)
+class Resource < Nucleon.plugin_class(:nucleon, :base)
 
   def self.register_ids
     [ :id ]
@@ -74,12 +70,12 @@ class Resource < Nucleon.plugin_class(:nucleon, :parallel_base)
 
   #---
 
-  def value
-    hash(@value)
+  def data
+    hash(@data)
   end
 
-  def value=value
-    @value = hash(value)
+  def data=data
+    @data = hash(data)
   end
 
   #-----------------------------------------------------------------------------
