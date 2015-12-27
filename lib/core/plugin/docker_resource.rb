@@ -109,6 +109,7 @@ class DockerResource < Nucleon.plugin_class(:CM, :resource)
       # A fork in the road!
       if internal?
         data = yield if block_given?
+        dbg(data, 'internal docker data')
         logger.info("Docker internal data: #{hash(data)}")
       else
         logger.info("Running deploy operation on #{plugin_provider} resource")
@@ -205,6 +206,7 @@ class DockerResource < Nucleon.plugin_class(:CM, :resource)
 
   def create_container
     container = nil
+    gem_path = "#{ENV['GEM_HOME']}/gems/cm-#{CM.VERSION}"
 
     destroy_container
 
@@ -212,6 +214,7 @@ class DockerResource < Nucleon.plugin_class(:CM, :resource)
     container_env << "NUCLEON_NO_PARALLEL=1" unless Nucleon.parallel?
     container_env << "NUCLEON_NO_COLOR=1" unless Nucleon::Util::Console.use_colors
 
+    dbg(gem_path, 'gem path')
     @container = Docker::Container.create({
       'name' => plugin_instance_name,
       'Image' => image,
@@ -222,14 +225,16 @@ class DockerResource < Nucleon.plugin_class(:CM, :resource)
         plan_directory => {},
         key_directory => {},
         input_directory => {},
-        output_directory => {}
+        output_directory => {},
+        gem_path => {}
       },
       'HostConfig' => {
         'Binds' => [
           "#{plan.path}:#{plan_directory}:ro",
           "#{plan.key_directory}:#{key_directory}:rw",
           "#{host_input_directory}:#{input_directory}:ro", # config.yaml and tokens.json
-          "#{host_output_directory}:#{output_directory}:rw" # ??.yaml and/or ??.json
+          "#{host_output_directory}:#{output_directory}:rw", # ??.yaml and/or ??.json
+          "#{gem_path}:#{gem_path}:ro"
         ]
       }
     })
