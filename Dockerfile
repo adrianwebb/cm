@@ -12,8 +12,5 @@ ENV GEM_CM_DEV=1 GEM_CM_DIRECTORY=/opt/cm/core CM_CMD_VERSION=0.1.4
 COPY . /opt/cm/core
 WORKDIR /opt/cm/core/bootstrap
 
-RUN /bin/bash -c "./bootstrap.sh base"
-RUN /bin/bash -c "./bootstrap.sh git"
-RUN /bin/bash -c "./bootstrap.sh ruby"
-RUN /bin/bash -c "./bootstrap.sh cm"
+RUN /bin/bash -c "./bootstrap.sh base git ruby cm"
 RUN /bin/bash -c "./bootstrap.sh test"
