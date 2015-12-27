@@ -7,6 +7,10 @@ module CM
 module Plugin
 class Plan < Nucleon.plugin_class(:CM, :disk_configuration)
 
+  include Nucleon::Parallel  # All sub providers are parallel capable
+
+  #---
+
   def self.register_ids
     [ :directory, :revision ]
   end
@@ -17,19 +21,7 @@ class Plan < Nucleon.plugin_class(:CM, :disk_configuration)
   def normalize(reload)
     super
 
-    @project = Nucleon.project(extended_config(:plan_project, {
-      :provider       => _get(:project_provider, Nucleon.type_default(:nucleon, :project)),
-      :directory      => _get(:path, Dir.pwd),
-      :url            => _get(:url),
-      :revision       => _get(:revision, :master),
-      :create         => true,
-      :pull           => true,
-      :nucleon_resave => false,
-      :nucleon_cache  => false,
-      :nucleon_file   => false
-    }))
-
-    if project && !reload
+    if !reload
       @loaded_config = CM.configuration(extended_config(:config_data, {
         :provider => _get(:config_provider, :directory),
         :path => config_path
@@ -70,15 +62,11 @@ class Plan < Nucleon.plugin_class(:CM, :disk_configuration)
   # Checks
 
   def initialized?(options = {})
-    project && loaded_config
+    loaded_config
   end
 
   #-----------------------------------------------------------------------------
   # Property accessors / modifiers
-
-  def project
-    @project
-  end
 
   def loaded_config
     @loaded_config
@@ -93,7 +81,7 @@ class Plan < Nucleon.plugin_class(:CM, :disk_configuration)
   #---
 
   def path
-    project.directory
+    _get(:path, Dir.pwd)
   end
 
   def key_directory
@@ -126,16 +114,6 @@ class Plan < Nucleon.plugin_class(:CM, :disk_configuration)
 
   def config_path
     _get(:config_path, path)
-  end
-
-  #---
-
-  def url
-    project.url
-  end
-
-  def revision
-    project.revision
   end
 
   #---
