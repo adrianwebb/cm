@@ -1,11 +1,7 @@
 
-nucleon_require(File.dirname(__FILE__), :parallel_base)
-
-#---
-
 module CM
 module Plugin
-class Configuration < Nucleon.plugin_class(:nucleon, :parallel_base)
+class Configuration < Nucleon.plugin_class(:nucleon, :base)
 
   include Nucleon::Mixin::SubConfig
 
