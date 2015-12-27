@@ -1,0 +1,7 @@
+---
+plan_provider: default
+plan_path: /home/vagrant/plan
+config_path: /home/vagrant/config
+token_path: /home/vagrant/config
+key_path: /home/vagrant/keys
+manifest: plan.yaml
