@@ -26,7 +26,7 @@ class Celluloid < Nucleon.plugin_class(:CM, :batch)
   def execute_parallel(operation)
     values = []
     resources.each do |resource|
-      values << Celluloid::Future.new(resource) do
+      values << ::Celluloid::Future.new(resource) do
         resource.execute(operation)
       end
     end
