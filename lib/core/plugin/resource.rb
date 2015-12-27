@@ -4,7 +4,7 @@ module Plugin
 class Resource < Nucleon.plugin_class(:nucleon, :base)
 
   def self.register_ids
-    [ :id ]
+    [ :plugin_name, :id ]
   end
 
   #-----------------------------------------------------------------------------
