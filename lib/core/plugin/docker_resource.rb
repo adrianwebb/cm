@@ -110,10 +110,11 @@ class DockerResource < Nucleon.plugin_class(:CM, :resource)
       if internal?
         data = yield if block_given?
       else
-        myself.value = action(plugin_provider, :deploy)
-        myself.status = code.docker_exec_failed unless value
+        data = action(plugin_provider, :deploy)
+        myself.status = code.docker_exec_failed unless data
       end
-      value
+      myself.data = data
+      myself.status == code.success
     end
   end
 
@@ -220,7 +221,7 @@ class DockerResource < Nucleon.plugin_class(:CM, :resource)
       },
       'HostConfig' => {
         'Binds' => [
-          "#{plan.path}:#{plan_directory}:rw",
+          "#{plan.path}:#{plan_directory}:ro",
           "#{plan.key_directory}:#{key_directory}:rw",
           "#{host_input_directory}:#{input_directory}:ro", # config.yaml and tokens.json
           "#{host_output_directory}:#{output_directory}:rw" # ??.yaml and/or ??.json
@@ -291,7 +292,7 @@ class DockerResource < Nucleon.plugin_class(:CM, :resource)
     containers = Docker::Container.all({ :all => 1 })
 
     containers.each do |cont|
-      if cont.info['Names'].include?("/#{plugin_instance_name}")
+      if cont.info.key?('Names') && cont.info['Names'].include?("/#{plugin_instance_name}")
         cont.kill!
         cont.remove
       end
