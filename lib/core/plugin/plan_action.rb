@@ -70,8 +70,6 @@ class PlanAction < Nucleon.plugin_class(:nucleon, :cm_action)
         'cm.action.plan.base.errors.default_resource_provider'
       ]
 
-      project_config
-
       yield if block_given?
     end
   end
@@ -107,9 +105,6 @@ class PlanAction < Nucleon.plugin_class(:nucleon, :cm_action)
       :token_provider            => settings[:token_provider],
       :token_directory           => settings[:token_path],
       :token_file                => settings[:token_file],
-      :project_provider          => settings[:project_provider],
-      :url                       => settings[:project_reference],
-      :revision                  => settings[:project_revision],
       :trap                      => settings[:trap],
       :sequence_provider         => settings[:sequence_provider],
       :batch_provider            => settings[:batch_provider],
