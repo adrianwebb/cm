@@ -3,4 +3,4 @@
 	url = https://github.com/adrianwebb/cm-bootstrap.git
 [submodule "toolbox"]
 	path = toolbox
-	url = https://github.com/coralnexus/coral-toolbox.git
+	url = https://github.com/adrianwebb/gem-toolbox.git
