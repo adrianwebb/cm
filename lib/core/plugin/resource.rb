@@ -61,7 +61,7 @@ class Resource < Nucleon.plugin_class(:nucleon, :base)
   #---
 
   def id
-    get(:id, '')
+    get(:id, '').to_sym
   end
 
   def parameters
