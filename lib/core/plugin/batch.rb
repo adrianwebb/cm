@@ -54,6 +54,16 @@ class Batch < Nucleon.plugin_class(:nucleon, :base)
     init_resources
   end
 
+  #---
+
+  def quit
+    @quit
+  end
+
+  def quit=quit
+    @quit = quit
+  end
+
   #-----------------------------------------------------------------------------
   # Operations
 
@@ -83,7 +93,10 @@ class Batch < Nucleon.plugin_class(:nucleon, :base)
     success = true
     resources.each do |resource|
       success = false unless resource.execute(operation)
-      break if plan.trap && plan.step
+      myself.quit = resource.quit ||
+        ((resource.plugin_type != :sequence || resource.plugin_provider != :variables) &&
+        plan.trap && plan.step)
+      break if quit
     end
     success
   end

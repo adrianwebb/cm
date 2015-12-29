@@ -62,6 +62,16 @@ class Sequence < Nucleon.plugin_class(:nucleon, :base)
     init_resources
   end
 
+  #---
+
+  def quit
+    @quit
+  end
+
+  def quit=quit
+    @quit = quit
+  end
+
   #-----------------------------------------------------------------------------
   # Operations
 

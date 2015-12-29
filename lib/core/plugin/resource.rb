@@ -78,6 +78,16 @@ class Resource < Nucleon.plugin_class(:nucleon, :base)
     @data = hash(data)
   end
 
+  #---
+
+  def quit
+    @quit
+  end
+
+  def quit=quit
+    @quit = quit
+  end
+
   #-----------------------------------------------------------------------------
   # Operations
 
