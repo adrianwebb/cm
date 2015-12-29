@@ -24,7 +24,7 @@ class Default < Nucleon.plugin_class(:CM, :sequence)
     super do |success|
       resources.each do |resource|
         success = false unless resource.execute(operation)
-        break if plan.trap && plan.step
+        break if resource.plugin_provider != :variables && plan.trap && plan.step
       end
       success
     end
@@ -36,7 +36,7 @@ class Default < Nucleon.plugin_class(:CM, :sequence)
     super do |success|
       resources.reverse.each do |resource|
         success = false unless resource.execute(operation)
-        break if plan.trap && plan.step
+        break if resource.plugin_provider != :variables && plan.trap && plan.step
       end
       success
     end
