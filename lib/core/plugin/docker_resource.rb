@@ -82,7 +82,7 @@ class DockerResource < Nucleon.plugin_class(:CM, :resource)
   #---
 
   def host_input_directory
-    get(:host_input_directory, "/tmp/cm/input/#{plugin_instance_name}")
+    get(:host_input_directory, "/tmp/cm-data/input/#{plugin_instance_name}")
   end
 
   def input_directory
@@ -92,7 +92,7 @@ class DockerResource < Nucleon.plugin_class(:CM, :resource)
   #---
 
   def host_output_directory
-    get(:host_output_directory, "/tmp/cm/output/#{plugin_instance_name}")
+    get(:host_output_directory, "/tmp/cm-data/output/#{plugin_instance_name}")
   end
 
   def output_directory
@@ -109,7 +109,6 @@ class DockerResource < Nucleon.plugin_class(:CM, :resource)
       # A fork in the road!
       if internal?
         data = yield if block_given?
-        dbg(data, 'internal docker data')
         logger.info("Docker internal data: #{hash(data)}")
       else
         logger.info("Running deploy operation on #{plugin_provider} resource")
@@ -214,7 +213,6 @@ class DockerResource < Nucleon.plugin_class(:CM, :resource)
     container_env << "NUCLEON_NO_PARALLEL=1" unless Nucleon.parallel?
     container_env << "NUCLEON_NO_COLOR=1" unless Nucleon::Util::Console.use_colors
 
-    dbg(gem_path, 'gem path')
     @container = Docker::Container.create({
       'name' => plugin_instance_name,
       'Image' => image,
