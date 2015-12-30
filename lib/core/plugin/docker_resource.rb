@@ -34,7 +34,7 @@ class DockerResource < Nucleon.plugin_class(:CM, :resource)
   #---
 
   def remove_plugin
-    destroy_container(plugin_instance_name)
+    destroy_container
   end
 
   #-----------------------------------------------------------------------------
@@ -104,21 +104,30 @@ class DockerResource < Nucleon.plugin_class(:CM, :resource)
 
   def operation_deploy
     super do
-      data = nil
+      results = nil
 
       # A fork in the road!
       if internal?
-        data = yield if block_given?
-        logger.info("Docker internal data: #{hash(data)}")
+        results = yield if block_given?
+
+        output_config = CM.configuration(extended_config(:resource_results, {
+          :provider => get(:resource_output_provider, :file),
+          :path => "#{output_directory}/config.json"
+        }))
+        output_config.import(Nucleon::Config.ensure(results).export)
+        output_config.save
+        Nucleon.remove_plugin(output_config)
+
+        logger.info("Docker internal data: #{hash(results)}")
       else
         logger.info("Running deploy operation on #{plugin_provider} resource")
 
-        data = action(plugin_provider, :deploy)
-        logger.info("Docker return data: #{hash(data)}")
+        results = action(plugin_provider, :deploy)
+        logger.info("Docker return data: #{hash(results)}")
 
-        myself.status = code.docker_exec_failed unless data
+        myself.status = code.docker_exec_failed unless results
       end
-      myself.data = data
+      myself.data = results
       myself.status == code.success
     end
   end
@@ -140,8 +149,8 @@ class DockerResource < Nucleon.plugin_class(:CM, :resource)
 
     if results[2] == 0
       if output_config = CM.configuration(extended_config(:resource_results, {
-        :provider => get(:resource_result_provider, :directory),
-        :path => host_output_directory
+        :provider => get(:resource_result_provider, :file),
+        :path => "#{host_output_directory}/config.json"
       }))
         data = Nucleon::Util::Data.clone(output_config.export)
         Nucleon.remove_plugin(output_config)
@@ -188,7 +197,7 @@ class DockerResource < Nucleon.plugin_class(:CM, :resource)
     })
     action_config[:data][:log_level] = Nucleon.log_level if Nucleon.log_level
 
-    data = command('cm', Nucleon::Util::Data.clean({
+    results = command('cm', Nucleon::Util::Data.clean({
       :subcommand => action_config,
       :quiet      => Nucleon::Util::Console.quiet
     })) do |stream, message|
