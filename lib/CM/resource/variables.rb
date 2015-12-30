@@ -22,7 +22,7 @@ class Variables < Nucleon.plugin_class(:CM, :resource)
 
   def operation_deploy
     super do
-      success = true
+      data = {}
     end
   end
 
@@ -30,7 +30,7 @@ class Variables < Nucleon.plugin_class(:CM, :resource)
 
   def operation_destroy
     super do
-      success = true
+      data = {}
     end
   end
 

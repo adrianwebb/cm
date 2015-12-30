@@ -26,7 +26,7 @@ class Concourse < Nucleon.plugin_class(:CM, :docker_resource)
 
   def operation_deploy
     super do
-      success = true
+      data = {}
     end
   end
 
@@ -34,7 +34,7 @@ class Concourse < Nucleon.plugin_class(:CM, :docker_resource)
 
   def operation_destroy
     super do
-      success = true
+      data = {}
     end
   end
 
