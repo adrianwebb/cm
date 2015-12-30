@@ -94,18 +94,15 @@ class Resource < Nucleon.plugin_class(:nucleon, :base)
   def execute(operation)
     if initialized?
       method = "operation_#{operation}"
-      success = true
+
+      myself.status = code.success
 
       execute_functions
       interpolate_parameters
 
-      if respond_to?(method)
-        success = send(method)
-      end
-    else
-      success = false
+      send(method) if respond_to?(method)
     end
-    success
+    myself.status == code.success
   end
 
   #---
