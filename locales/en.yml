@@ -22,6 +22,19 @@ en:
           No translator provider available for: %{provider}
         config_file: |-
           Failed to parse the execution plan manifest %{file}
+  resource:
+    variables:
+      info:
+        deploy_variables: |-
+          Generating %{id} variables
+        destroy_variables: |-
+          Generating %{id} variables
+    aws:
+      info:
+        deploy_keypair: |-
+          Deploying AWS %{id} %{type}: %{name}
+        destroy_keypair: |-
+          Destroying AWS %{id} %{type}: %{name}
   cm:
     resource:
       docker:
