@@ -197,7 +197,7 @@ class DockerResource < Nucleon.plugin_class(:CM, :resource)
     })
     action_config[:data][:log_level] = Nucleon.log_level if Nucleon.log_level
 
-    results = command('cm', Nucleon::Util::Data.clean({
+    data = command('cm', Nucleon::Util::Data.clean({
       :subcommand => action_config,
       :quiet      => Nucleon::Util::Console.quiet
     })) do |stream, message|
@@ -274,7 +274,7 @@ class DockerResource < Nucleon.plugin_class(:CM, :resource)
       :provider => get(:container_input_config_provider, :file),
       :path => "#{host_input_directory}/config.json"
     }))
-    config.import(plan.manifest_config)
+    config.import({ :config => plan.manifest_config })
     config.save
 
     Nucleon.remove_plugin(config)
@@ -293,6 +293,7 @@ class DockerResource < Nucleon.plugin_class(:CM, :resource)
     action_settings[:resource_config] = myself.settings
     action_settings[:settings_path] = "#{input_directory}/action_settings.json"
     action_settings[:plan_path] = plan_directory
+    action_settings[:manifest] = plan.manifest_file
     action_settings[:config_provider] = 'file'
     action_settings[:config_path] = "#{input_directory}/config.json"
     action_settings[:token_provider] = 'file'
