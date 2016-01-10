@@ -21,11 +21,20 @@ class AWS < Nucleon.plugin_class(:CM, :docker_resource)
   #-----------------------------------------------------------------------------
   # Property accessors / modifiers
 
+  def template
+    settings[:template]
+  end
+
   #-----------------------------------------------------------------------------
   # Operations
 
   def operation_deploy
     super do
+      if template.to_sym == :keypair
+        info('deploy_keypair', { :id => id, :name => parameters[:Name], :prefix => false })
+      else
+        info('deploy_cloudformation', { :id => id, :prefix => false })
+      end
       data = {}
     end
   end
@@ -34,6 +43,11 @@ class AWS < Nucleon.plugin_class(:CM, :docker_resource)
 
   def operation_destroy
     super do
+      if template.to_sym == :keypair
+        info('destroy_keypair', { :id => id, :name => parameters[:Name], :prefix => false })
+      else
+        info('destroy_cloudformation', { :id => id, :prefix => false })
+      end
       data = {}
     end
   end
