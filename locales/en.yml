@@ -32,9 +32,13 @@ en:
     aws:
       info:
         deploy_keypair: |-
-          Deploying AWS %{id} %{type}: %{name}
+          Deploying AWS %{id} keypair: %{name}
         destroy_keypair: |-
-          Destroying AWS %{id} %{type}: %{name}
+          Destroying AWS %{id} keypair: %{name}
+        deploy_cloudformation: |-
+          Deploying AWS template: %{id}
+        destroy_cloudformation: |-
+          Destroying AWS template: %{id}
   cm:
     resource:
       docker:
