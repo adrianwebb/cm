@@ -1,0 +1,10 @@
+#/bin/bash
+
+SCRIPT_DIR="$(cd "$(dirname "$([ `readlink "$0"` ] && echo "`readlink "$0"`" || echo "$0")")"; pwd -P)"
+cd "$SCRIPT_DIR"
+
+export RUBY_GEM_PATH="${1:-/usr/local/rvm/gems/rbx-2.5.2/gems}"
+export GEM_CM_DIRECTORY="${1:-$SCRIPT_DIR}"
+export GEM_CM_VERSION="`cat ${SCRIPT_DIR}/VERSION`"
+
+"$SCRIPT_DIR"/vagrant/link.sh
