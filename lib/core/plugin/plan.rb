@@ -165,7 +165,7 @@ class Plan < Nucleon.plugin_class(:CM, :disk_configuration)
   #-----------------------------------------------------------------------------
   # Operations
 
-  def load
+  def load(check_only = false)
     success = true
 
     if initialized?
@@ -180,7 +180,7 @@ class Plan < Nucleon.plugin_class(:CM, :disk_configuration)
       override(loaded_config.get_hash(:config), :config)
 
       # Initializeresource sequence
-      @sequence = create_sequence(manifest_resources)
+      @sequence = create_sequence(manifest_resources) unless check_only
 
       yield if block_given?
     end
@@ -189,16 +189,16 @@ class Plan < Nucleon.plugin_class(:CM, :disk_configuration)
 
   #---
 
-  def execute(operation)
+  def execute(operation, check_only = false)
     success = true
 
     if initialized?
       if ::File.exist?(manifest_path)
         method = "operation_#{operation}"
 
-        if respond_to?(method) && load
+        if respond_to?(method) && load(check_only)
           init_tokens
-          success = send(method)
+          success = send(method) unless check_only
         end
         success
       else
