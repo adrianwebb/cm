@@ -11,7 +11,7 @@ Gem::Specification.new do |s|
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.require_paths = ["lib"]
   s.authors = ["Adrian Webb"]
-  s.date = "2015-12-27"
+  s.date = "2016-01-10"
   s.description = "\nPluggable cloud management framework that provides a simple foundation for\ndeploying and destroying enterprise ready cloud environments and components\nthat integrate; cloud provider components and services, cloud orchestration\nand configuration management tools, and continuous integration and delivery\npipelines.\n"
   s.email = "adrian.webb@gsa.gov"
   s.executables = ["cm"]
@@ -37,7 +37,6 @@ Gem::Specification.new do |s|
     "lib/CM/resource/BOSH.rb",
     "lib/CM/resource/MicroBOSH.rb",
     "lib/CM/resource/concourse.rb",
-    "lib/CM/resource/keypair.rb",
     "lib/CM/resource/variables.rb",
     "lib/CM/sequence/default.rb",
     "lib/cm.rb",
@@ -62,13 +61,16 @@ Gem::Specification.new do |s|
     "lib/nucleon/action/plan/destroy.rb",
     "lib/nucleon/action/resource/run.rb",
     "locales/en.yml",
-    "spec/spec_helper.rb"
+    "spec/spec_helper.rb",
+    "toolbox/LICENSE.txt",
+    "toolbox/README.txt",
+    "toolbox/lib/shell/LICENSE.txt"
   ]
   s.homepage = "http://github.com/adrianwebb/cm"
   s.licenses = ["Apache License, Version 2.0"]
   s.rdoc_options = ["--title", "CM (Cloud Manager)", "--main", "README.rdoc", "--line-numbers"]
   s.required_ruby_version = Gem::Requirement.new(">= 1.9.1")
-  s.rubygems_version = "2.4.5"
+  s.rubygems_version = "2.4.8"
   s.summary = "Pluggable cloud management framework that provides a simple foundation for deploying and destroying enterprise ready cloud environments and components"
 
   if s.respond_to? :specification_version then
@@ -77,14 +79,18 @@ Gem::Specification.new do |s|
     if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
       s.add_runtime_dependency(%q<nucleon>, ["~> 0.2"])
       s.add_runtime_dependency(%q<docker-api>, ["~> 1.24"])
-      s.add_development_dependency(%q<bundler>, ["~> 1.10"])
+      s.add_runtime_dependency(%q<nokogiri>, ["= 1.5.11"])
+      s.add_runtime_dependency(%q<fog-aws>, ["~> 0.8"])
+      s.add_development_dependency(%q<bundler>, [">= 1.7"])
       s.add_development_dependency(%q<jeweler>, ["~> 2.0"])
       s.add_development_dependency(%q<rspec>, ["~> 3.4"])
       s.add_development_dependency(%q<rdoc>, ["~> 4.2"])
     else
       s.add_dependency(%q<nucleon>, ["~> 0.2"])
       s.add_dependency(%q<docker-api>, ["~> 1.24"])
-      s.add_dependency(%q<bundler>, ["~> 1.10"])
+      s.add_dependency(%q<nokogiri>, ["= 1.5.11"])
+      s.add_dependency(%q<fog-aws>, ["~> 0.8"])
+      s.add_dependency(%q<bundler>, [">= 1.7"])
       s.add_dependency(%q<jeweler>, ["~> 2.0"])
       s.add_dependency(%q<rspec>, ["~> 3.4"])
       s.add_dependency(%q<rdoc>, ["~> 4.2"])
@@ -92,7 +98,9 @@ Gem::Specification.new do |s|
   else
     s.add_dependency(%q<nucleon>, ["~> 0.2"])
     s.add_dependency(%q<docker-api>, ["~> 1.24"])
-    s.add_dependency(%q<bundler>, ["~> 1.10"])
+    s.add_dependency(%q<nokogiri>, ["= 1.5.11"])
+    s.add_dependency(%q<fog-aws>, ["~> 0.8"])
+    s.add_dependency(%q<bundler>, [">= 1.7"])
     s.add_dependency(%q<jeweler>, ["~> 2.0"])
     s.add_dependency(%q<rspec>, ["~> 3.4"])
     s.add_dependency(%q<rdoc>, ["~> 4.2"])
