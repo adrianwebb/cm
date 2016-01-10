@@ -100,7 +100,10 @@ class Resource < Nucleon.plugin_class(:nucleon, :base)
       execute_functions
       interpolate_parameters
 
-      send(method) if respond_to?(method)
+      if respond_to?(method)
+        send(method)
+        set_tokens(myself.data)
+      end
     end
     myself.status == code.success
   end
@@ -199,6 +202,25 @@ class Resource < Nucleon.plugin_class(:nucleon, :base)
       init_tokens
       break if tries >= 10 || !interpolate.call(settings[:parameters])
     end
+  end
+
+  #---
+
+  def set_tokens(data)
+
+    parse_tokens = lambda do |local_data, parent_keys = []|
+      local_data.each do |key, value|
+        location = [parent_keys, key].flatten
+
+        if value.is_a?(Hash)
+          parse_tokens.call(value, location)
+        else
+          plan.set_token(id, location, value)
+        end
+      end
+    end
+
+    parse_tokens.call(data)
   end
 end
 end
