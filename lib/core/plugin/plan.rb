@@ -39,8 +39,6 @@ class Plan < Nucleon.plugin_class(:CM, :disk_configuration)
   #---
 
   def init_tokens
-    clear_tokens
-
     collect_tokens = lambda do |local_settings, token|
       local_settings.each do |name, value|
         setting_token = [ array(token), name ].flatten
@@ -199,8 +197,9 @@ class Plan < Nucleon.plugin_class(:CM, :disk_configuration)
         if respond_to?(method) && load(check_only)
           init_tokens
           success = send(method) unless check_only
+        else
+          success = false
         end
-        success
       else
         error('manifest_file', { :file => manifest_path })
         success = false
