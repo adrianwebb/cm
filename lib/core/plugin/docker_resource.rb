@@ -129,16 +129,16 @@ class DockerResource < Nucleon.plugin_class(:CM, :resource)
   def operation_deploy
     operation_run(:deploy) do
       data = super
-      yield if block_given?
-      data
+      child_data = yield if block_given?
+      Nucleon::Util::Data.merge([ data, hash(child_data) ], true, false)
     end
   end
 
   def operation_destroy
     operation_run(:destroy) do
       data = super
-      yield if block_given?
-      data
+      child_data = yield if block_given?
+      Nucleon::Util::Data.merge([ data, hash(child_data) ], true, false)
     end
   end
 
