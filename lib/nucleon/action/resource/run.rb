@@ -12,13 +12,6 @@ class Run < Nucleon.plugin_class(:nucleon, :plan_action)
   end
 
   #-----------------------------------------------------------------------------
-  # Checks
-
-  def strict?
-    false
-  end
-
-  #-----------------------------------------------------------------------------
   # Settings
 
   def configure
