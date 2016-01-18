@@ -26,7 +26,7 @@ Vagrant.configure('2') do |config|
 
     # Basic VM settings and shares
     node.vm.provider :virtualbox do |provider, override|
-      provider.memory = 2048
+      provider.memory = 4096
       provider.cpus = 2
       provider.customize ['modifyvm', :id, '--cpuexecutioncap', '50']
 
