@@ -227,9 +227,9 @@ class Plan < Nucleon.plugin_class(:CM, :disk_configuration)
 
   def create_sequence(resources)
     CM.sequence({
-      :plan => myself,
+      :id => Nucleon.sha1(resources),
       :resources => resources,
-      :new => true,
+      :plan => myself
     }, _get(:sequence_provider, :default))
   end
 
@@ -237,9 +237,9 @@ class Plan < Nucleon.plugin_class(:CM, :disk_configuration)
 
   def create_batch(resources)
     CM.batch({
-      :plan => myself,
+      :id => Nucleon.sha1(resources),
       :resources => resources,
-      :new => true
+      :plan => myself
     }, _get(:batch_provider, :celluloid))
   end
 
@@ -250,9 +250,9 @@ class Plan < Nucleon.plugin_class(:CM, :disk_configuration)
     settings[:type] ||= _get(:default_resource_provider, :variables)
 
     CM.resource({
-      :plan => myself,
+      :id => settings[:name],
       :settings => settings.export,
-      :id => settings[:name]
+      :plan => myself
     }, settings[:type])
   end
 
