@@ -25,22 +25,34 @@ en:
   resource:
     variables:
       info:
-        deploy_variables: |-
-          Generating %{id} variables
-        destroy_variables: |-
+        create_variables: |-
           Generating %{id} variables
     aws:
       info:
-        deploy_keypair: |-
-          Deploying AWS %{id} keypair: %{name}
-        destroy_keypair: |-
-          Destroying AWS %{id} keypair: %{name}
-        deploy_cloudformation: |-
-          Deploying AWS template: %{id}
-        destroy_cloudformation: |-
-          Destroying AWS template: %{id}
+        create_keypair: |-
+          Creating AWS %{id} keypair: %{name}
+        check_keypair: |-
+          Checking AWS %{id} keypair: %{name}
+        update_keypair: |-
+          Updating AWS %{id} keypair: %{name}
+        delete_keypair: |-
+          Deleting AWS %{id} keypair: %{name}
+        create_stack: |-
+          Creating AWS %{id} stack: %{name}
+        update_stack: |-
+          Creating AWS %{id} stack: %{name}
+        delete_stack: |-
+          Deleting AWS %{id} stack: %{name}
+  batch:
+    celluloid:
+      error:
+        resource_execution: |-
+          Resource %{id} %{operation} execution failed with: %{message}
   cm:
     resource:
+      info:
+        run_internal: |-
+          Running resource %{id} %{op} at %{time}
       docker:
         info:
           no_credentials: |-
@@ -48,7 +60,17 @@ en:
         error:
           container_failed: |-
             Docker %{image} container for %{command} from creation failed
+      docker_resource:
+        info:
+          run_dockerized: |-
+            Preparing %{image} Docker environment for resource %{id} %{op} at %{time}
     action:
+      docker_resource:
+        options:
+          docker: |-
+            Enable or disable the Dockerization of the Resources that utilize Docker containers (default %{default_value})
+          keep_alive: |-
+            If specified, Docker containers are left running after program terminates (default %{default_value})
       plan:
         base:
           options:
@@ -86,4 +108,4 @@ en:
             TODO: Fill this help information in!!
           info:
             start: |-
-              Destroying cloud environment built from cloud definition
+              Destroying cloud environment
