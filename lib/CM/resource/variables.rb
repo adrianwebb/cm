@@ -20,19 +20,9 @@ class Variables < Nucleon.plugin_class(:CM, :resource)
   #-----------------------------------------------------------------------------
   # Operations
 
-  def operation_deploy
-    super do
-      info('deploy_variables', { :id => id })
-      data = {}
-    end
-  end
-
-  #---
-
-  def operation_destroy
-    super do
-      info('destroy_variables', { :id => id })
-      data = {}
+  def create_resource
+    super do |data|
+      info('create_variables', { :id => id })
     end
   end
 
