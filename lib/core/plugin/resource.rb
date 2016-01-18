@@ -3,8 +3,14 @@ module CM
 module Plugin
 class Resource < Nucleon.plugin_class(:nucleon, :base)
 
+  #-----------------------------------------------------------------------------
+
   def self.register_ids
-    [ :plugin_name, :id ]
+    [ :id ]
+  end
+
+  def self.options(action)
+    # Override if needed
   end
 
   #-----------------------------------------------------------------------------
@@ -60,12 +66,22 @@ class Resource < Nucleon.plugin_class(:nucleon, :base)
 
   #---
 
+  def action_settings
+    plan.action_settings
+  end
+
+  #---
+
   def id
-    get(:id, '').to_sym
+    get(:id, plugin_instance_name).to_sym
   end
 
   def parameters
     hash(settings[:parameters])
+  end
+
+  def timeout
+    settings[:timeout] ||= 1000
   end
 
   #---
@@ -101,7 +117,7 @@ class Resource < Nucleon.plugin_class(:nucleon, :base)
       interpolate_parameters
 
       if respond_to?(method)
-        send(method)
+        myself.data = send(method)
         set_tokens(myself.data)
       end
     end
@@ -111,13 +127,46 @@ class Resource < Nucleon.plugin_class(:nucleon, :base)
   #---
 
   def operation_deploy
-    yield if block_given?
+    info('cm.resource.info.run_internal', { :id => Nucleon.green(id), :op => 'deploy', :time => Nucleon.purple(Time.now.to_s) })
+    if retrieve_resource
+      data = update_resource
+    else
+      data = create_resource
+    end
+    data
   end
 
   #---
 
   def operation_destroy
-    yield if block_given?
+    info('cm.resource.info.run_internal', { :id => Nucleon.green(id), :op => 'destroy', :time => Nucleon.purple(Time.now.to_s) })
+    delete_resource
+  end
+
+  #---
+
+  def create_resource
+    data = {}
+    yield(data) if block_given?
+    data
+  end
+
+  def retrieve_resource
+    result = nil
+    result = yield if block_given?
+    result
+  end
+
+  def update_resource
+    data = {}
+    yield(data) if block_given?
+    data
+  end
+
+  def delete_resource
+    data = {}
+    yield(data) if block_given?
+    data
   end
 
   #-----------------------------------------------------------------------------
@@ -207,7 +256,6 @@ class Resource < Nucleon.plugin_class(:nucleon, :base)
   #---
 
   def set_tokens(data)
-
     parse_tokens = lambda do |local_data, parent_keys = []|
       local_data.each do |key, value|
         location = [parent_keys, key].flatten
