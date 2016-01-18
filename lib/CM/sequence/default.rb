@@ -23,7 +23,9 @@ class Default < Nucleon.plugin_class(:CM, :sequence)
   def forward(operation)
     super do |success|
       resources.each do |resource|
-        success = false unless resource.execute(operation)
+        resource.execute(operation)
+        success = false unless resource.status == code.success
+
         myself.quit = resource.quit ||
           (((resource.plugin_type == :batch && !Nucleon.parallel?) ||
           resource.plugin_provider != :variables) && plan.trap && plan.step)
@@ -38,7 +40,9 @@ class Default < Nucleon.plugin_class(:CM, :sequence)
   def reverse(operation)
     super do |success|
       resources.reverse.each do |resource|
-        success = false unless resource.execute(operation)
+        resource.execute(operation)
+        success = false unless resource.status == code.success
+
         myself.quit = resource.quit ||
           (((resource.plugin_type == :batch && !Nucleon.parallel?) ||
           resource.plugin_provider != :variables) && plan.trap && plan.step)
