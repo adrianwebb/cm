@@ -8,6 +8,13 @@ module Plugin
 class DockerResource < Nucleon.plugin_class(:CM, :resource)
 
   #-----------------------------------------------------------------------------
+
+  def self.options(action)
+    action.register_bool :docker, true, 'cm.action.docker_resource.options.docker'
+    action.register_bool :keep_alive, false, 'cm.action.docker_resource.options.keep_alive'
+  end
+
+  #-----------------------------------------------------------------------------
   # Plugin interface
 
   def normalize(reload)
@@ -27,6 +34,11 @@ class DockerResource < Nucleon.plugin_class(:CM, :resource)
     else
       Docker.url = "#{settings[:docker_protocol]}://#{settings[:docker_host]}:#{settings[:docker_port]}"
     end
+
+    Docker.options[:write_timeout] = timeout
+    Excon.defaults[:write_timeout] = timeout
+    Docker.options[:read_timeout] = timeout
+    Excon.defaults[:read_timeout] = timeout
 
     yield if block_given?
   end
@@ -50,8 +62,20 @@ class DockerResource < Nucleon.plugin_class(:CM, :resource)
     File.exist?('/.dockerinit')
   end
 
+  def dockerize?
+    action_settings[:docker] || settings[:docker]
+  end
+
+  def keep_alive?
+    action_settings[:keep_alive] || settings[:keep_alive]
+  end
+
   #-----------------------------------------------------------------------------
   # Property accessors / modifiers
+
+  def docker_id
+    @docker_id ||= "#{id}-#{Time.now.strftime('%Y-%m-%dT%H-%M-%S%z')}"
+  end
 
   def image
     get(:image, 'awebb/cm').to_s
@@ -82,61 +106,79 @@ class DockerResource < Nucleon.plugin_class(:CM, :resource)
   #---
 
   def host_input_directory
-    get(:host_input_directory, "/tmp/cm-data/input/#{plugin_instance_name}")
+    get(:host_input_directory, "/tmp/cm-data/input/#{docker_id}")
   end
 
   def input_directory
-    get(:input_directory, '/opt/cm/volumes/input')
+    get(:input_directory, "/opt/cm/volumes/input")
   end
 
   #---
 
   def host_output_directory
-    get(:host_output_directory, "/tmp/cm-data/output/#{plugin_instance_name}")
+    get(:host_output_directory, "/tmp/cm-data/output/#{docker_id}")
   end
 
   def output_directory
-    get(:output_directory, '/opt/cm/volumes/output')
+    get(:output_directory, "/opt/cm/volumes/output")
   end
 
   #-----------------------------------------------------------------------------
   # Operations
 
   def operation_deploy
-    super do
-      results = nil
+    operation_run(:deploy) do
+      data = super
+      yield if block_given?
+      data
+    end
+  end
 
-      # A fork in the road!
-      if internal?
-        results = yield if block_given?
+  def operation_destroy
+    operation_run(:destroy) do
+      data = super
+      yield if block_given?
+      data
+    end
+  end
+
+  #---
+
+  def operation_run(operation)
+    data = {}
+
+    # A fork in the road!
+    if !dockerize? || internal?
+      data = yield if block_given?
+
+      if dockerize?
+        FileUtils.mkdir_p(output_directory)
 
         output_config = CM.configuration(extended_config(:resource_results, {
           :provider => get(:resource_output_provider, :file),
           :path => "#{output_directory}/config.json"
         }))
-        output_config.import(Nucleon::Config.ensure(results).export)
+        output_config.import(Nucleon::Config.ensure(data).export)
         output_config.save
         Nucleon.remove_plugin(output_config)
-
-        logger.info("Docker internal data: #{hash(results)}")
-      else
-        logger.info("Running deploy operation on #{plugin_provider} resource")
-
-        results = action(plugin_provider, :deploy)
-        logger.info("Docker return data: #{hash(results)}")
-
-        myself.status = code.docker_exec_failed unless results
       end
-      myself.data = results
-      myself.status == code.success
+
+      logger.info("Docker internal data: #{hash(data)}")
+    else
+      info('cm.resource.docker_resource.info.run_dockerized', { :image => Nucleon.yellow(image), :id => Nucleon.green(id), :op => operation, :time => Nucleon.purple(Time.now.to_s) })
+      logger.info("Running #{operation} operation on #{plugin_provider} resource")
+
+      data = action(plugin_provider, operation)
+      logger.info("Docker return data: #{hash(data)}")
     end
+    data
   end
 
   #-----------------------------------------------------------------------------
   # Docker resource operation execution
 
   def exec(command)
-    data = nil
+    data = {}
 
     create_container
 
@@ -156,28 +198,20 @@ class DockerResource < Nucleon.plugin_class(:CM, :resource)
         Nucleon.remove_plugin(output_config)
       end
     end
-
-    destroy_container
     data
+  ensure
+    destroy_container
   end
 
   #---
 
   def command(command, options = {})
-    config         = Nucleon::Config.ensure(options)
-    remove_command = false
+    command = Nucleon.command(Nucleon::Config.new({ :command => command }, {}, true, false).import(options), :bash)
+    Nucleon.remove_plugin(command)
 
-    unless command.is_a?(Nucleon::Plugin::Command)
-      command        = Nucleon.command(Nucleon::Config.new({ :command => command }, {}, true, false).import(config), :bash)
-      remove_command = true
-    end
-
-    data = exec(command.to_s.strip) do |stream, message|
+    exec(command.to_s.strip) do |stream, message|
       yield(stream, message) if block_given?
     end
-
-    Nucleon.remove_plugin(command) if remove_command
-    data
   end
 
   #---
@@ -189,24 +223,21 @@ class DockerResource < Nucleon.plugin_class(:CM, :resource)
     action_settings = Nucleon::Util::Data.clean(plan.action_settings)
     initialize_remote_config(action_settings)
 
-    encoded_config = Nucleon::Util::CLI.encode(action_settings)
-    action_config  = extended_config(:action, {
-      :command => 'resource run',
-      :data    => { :encoded  => encoded_config },
-      :args    => [ provider, operation ]
-    })
-    action_config[:data][:log_level] = Nucleon.log_level if Nucleon.log_level
-
-    data = command('cm', Nucleon::Util::Data.clean({
-      :subcommand => action_config,
-      :quiet      => Nucleon::Util::Console.quiet
+    command('cm', Nucleon::Util::Data.clean({
+      :subcommand => extended_config(:action, {
+        :command => 'resource run',
+        :data => { :encoded  => Nucleon::Util::CLI.encode(action_settings) },
+        :args => [ provider, operation ]
+      }),
+      :quiet => Nucleon::Util::Console.quiet
     })) do |stream, message|
       yield(stream, message) if block_given?
     end
-
-    FileUtils.rm_rf(host_input_directory)
-    FileUtils.rm_rf(host_output_directory)
-    data
+  ensure
+    unless keep_alive?
+      FileUtils.rm_rf(host_input_directory)
+      FileUtils.rm_rf(host_output_directory)
+    end
   end
 
   #-----------------------------------------------------------------------------
@@ -216,14 +247,15 @@ class DockerResource < Nucleon.plugin_class(:CM, :resource)
     container = nil
     gem_path = "#{ENV['GEM_HOME']}/gems/cm-#{CM.VERSION}"
 
-    destroy_container
+    destroy_container(true)
 
     container_env = []
+    container_env << "NUCLEON_LOG=#{Nucleon.log_level}" if Nucleon.log_level
     container_env << "NUCLEON_NO_PARALLEL=1" unless Nucleon.parallel?
     container_env << "NUCLEON_NO_COLOR=1" unless Nucleon::Util::Console.use_colors
 
     @container = Docker::Container.create({
-      'name' => plugin_instance_name,
+      'name' => docker_id,
       'Image' => image,
       'Cmd' => array(startup_commands),
       'Tty' => true,
@@ -259,16 +291,6 @@ class DockerResource < Nucleon.plugin_class(:CM, :resource)
   #---
 
   def initialize_remote_config(action_settings)
-    # Generate action settings file
-    settings = CM.configuration(extended_config(:container_input_settings_data, {
-      :provider => get(:container_input_settings_provider, :file),
-      :path => "#{host_input_directory}/action_settings.json"
-    }))
-    settings.import(action_settings)
-    settings.save
-
-    Nucleon.remove_plugin(settings)
-
     # Generate and store plan configuration in local input directory
     config = CM.configuration(extended_config(:container_input_config_data, {
       :provider => get(:container_input_config_provider, :file),
@@ -276,7 +298,6 @@ class DockerResource < Nucleon.plugin_class(:CM, :resource)
     }))
     config.import({ :config => plan.manifest_config })
     config.save
-
     Nucleon.remove_plugin(config)
 
     # Generate and store plan tokens in local input directory
@@ -286,12 +307,10 @@ class DockerResource < Nucleon.plugin_class(:CM, :resource)
     }))
     tokens.import(plan.tokens)
     tokens.save
-
     Nucleon.remove_plugin(tokens)
 
     # Customize action settings
     action_settings[:resource_config] = myself.settings
-    action_settings[:settings_path] = "#{input_directory}/action_settings.json"
     action_settings[:plan_path] = plan_directory
     action_settings[:manifest] = plan.manifest_file
     action_settings[:config_provider] = 'file'
@@ -306,17 +325,19 @@ class DockerResource < Nucleon.plugin_class(:CM, :resource)
 
   #---
 
-  def destroy_container
-    containers = Docker::Container.all({ :all => 1 })
+  def destroy_container(override = false)
+    if override || !keep_alive?
+      containers = Docker::Container.all({ :all => 1 })
 
-    # TODO: Fix occasional crashed actor issue when in parallel mode
-    containers.each do |cont|
-      if cont.info.key?('Names') && cont.info['Names'].include?("/#{plugin_instance_name}")
-        cont.kill!
-        cont.remove
+      # TODO: Fix occasional crashed actor issue when in parallel mode
+      containers.each do |cont|
+        if cont.info.key?('Names') && cont.info['Names'].include?("/#{docker_id}")
+          cont.kill!
+          cont.remove
+        end
       end
+      @container = nil
     end
-    @container = nil
   end
   protected :destroy_container
 
@@ -324,11 +345,12 @@ class DockerResource < Nucleon.plugin_class(:CM, :resource)
 
   def render_docker_message(stream, message)
     if stream == 'stderr'
-      warn(message, { :i18n => false })
+      warn("(#{Nucleon.red(image)})>#{message}", { :i18n => false, :prefix => false })
     else
-      info(message, { :i18n => false })
+      info("(#{Nucleon.yellow(image)})>#{message}", { :i18n => false, :prefix => false })
     end
   end
+  protected :render_docker_message
 end
 end
 end
