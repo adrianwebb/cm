@@ -3,11 +3,17 @@ module CM
 module Plugin
 class Batch < Nucleon.plugin_class(:nucleon, :base)
 
+  def self.register_ids
+    [ :id ]
+  end
+
   #-----------------------------------------------------------------------------
   # Plugin interface
 
   def normalize(reload)
     super
+
+    codes :batch_failed
 
     @plan = delete(:plan, nil) unless reload
 
@@ -56,6 +62,12 @@ class Batch < Nucleon.plugin_class(:nucleon, :base)
 
   #---
 
+  def id
+    get(:id).to_sym
+  end
+
+  #---
+
   def quit
     @quit
   end
@@ -69,6 +81,8 @@ class Batch < Nucleon.plugin_class(:nucleon, :base)
 
   def execute(operation)
     if initialized?
+      myself.status = code.success
+
       if Nucleon.parallel?
         success = execute_parallel(operation)
       else
@@ -77,6 +91,7 @@ class Batch < Nucleon.plugin_class(:nucleon, :base)
     else
       success = false
     end
+    myself.status = code.batch_failed unless success
     success
   end
 
@@ -92,7 +107,9 @@ class Batch < Nucleon.plugin_class(:nucleon, :base)
   def execute_sequence(operation)
     success = true
     resources.each do |resource|
-      success = false unless resource.execute(operation)
+      resource.execute(operation)
+      success = false unless resource.status == code.success
+
       myself.quit = resource.quit ||
         ((resource.plugin_type != :sequence || resource.plugin_provider != :variables) &&
         plan.trap && plan.step)
