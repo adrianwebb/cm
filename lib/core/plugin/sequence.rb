@@ -3,11 +3,17 @@ module CM
 module Plugin
 class Sequence < Nucleon.plugin_class(:nucleon, :base)
 
+  def self.register_ids
+    [ :id ]
+  end
+
   #-----------------------------------------------------------------------------
   # Plugin interface
 
   def normalize(reload)
     super
+
+    codes :sequence_failed
 
     @plan = delete(:plan, nil) unless reload
 
@@ -64,6 +70,12 @@ class Sequence < Nucleon.plugin_class(:nucleon, :base)
 
   #---
 
+  def id
+    get(:id).to_sym
+  end
+
+  #---
+
   def quit
     @quit
   end
@@ -77,11 +89,14 @@ class Sequence < Nucleon.plugin_class(:nucleon, :base)
 
   def forward(operation)
     if initialized?
+      myself.status = code.success
+
       success = true
       success = yield(success) if block_given?
     else
       success = false
     end
+    myself.status = code.sequence_failed unless success
     success
   end
 
@@ -89,11 +104,14 @@ class Sequence < Nucleon.plugin_class(:nucleon, :base)
 
   def reverse(operation)
     if initialized?
+      myself.status = code.success
+
       success = true
       success = yield(success) if block_given?
     else
       success = false
     end
+    myself.status = code.sequence_failed unless success
     success
   end
 
