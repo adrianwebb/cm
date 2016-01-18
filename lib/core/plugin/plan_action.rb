@@ -19,6 +19,13 @@ class PlanAction < Nucleon.plugin_class(:nucleon, :cm_action)
   end
 
   #-----------------------------------------------------------------------------
+  # Checks
+
+  def strict?
+    false
+  end
+
+  #-----------------------------------------------------------------------------
   # Property accessor / modifiers
 
   def configure
@@ -69,6 +76,11 @@ class PlanAction < Nucleon.plugin_class(:nucleon, :cm_action)
         'cm.action.plan.base.options.default_resource_provider',
         'cm.action.plan.base.errors.default_resource_provider'
       ]
+
+      # Loading additional registered resource plugin options
+      Nucleon.loaded_plugins(:CM, :resource).each do |resource, data|
+        data[:class].options(myself)
+      end
 
       yield if block_given?
     end
