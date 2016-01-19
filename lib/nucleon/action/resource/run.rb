@@ -36,12 +36,22 @@ class Run < Nucleon.plugin_class(:nucleon, :plan_action)
     super do
       resource = nil
 
-      if plan.execute(settings[:operation], true)
-        resource = plan.create_resource(settings[:resource_config])
-        resource.execute(settings[:operation])
-      end
+      begin
+        if plan.execute(settings[:operation], true)
+          resource = plan.create_resource(settings[:resource_config])
+          resource.execute(settings[:operation])
+        end
+        myself.status = code.run_failed unless resource && resource.status == code.success
 
-      myself.status = code.run_failed unless resource && resource.status == code.success
+      rescue => error
+        logger.error("Resource #{resource.id} #{settings[:operation]} experienced an error:")
+        logger.error(error.inspect)
+        logger.error(error.message)
+        logger.error(Nucleon::Util::Data.to_yaml(error.backtrace))
+
+        error('resource_execution', { :id => resource.id, :operation => settings[:operation], :message => error.message })
+        myself.status = code.run_failed
+      end
     end
   end
 end
