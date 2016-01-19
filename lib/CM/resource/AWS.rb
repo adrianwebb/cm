@@ -252,8 +252,9 @@ class AWS < Nucleon.plugin_class(:CM, :docker_resource)
         handle_stack_failure(name)
       end
 
+    rescue Fog::AWS::CloudFormation::NotFound => error
+      info('update_stack_updated', { :id => id, :name => name, :message => error.message })
     rescue => error
-      dbg(error.class, 'error class')
       error('update_stack_failed', { :id => id, :name => name, :message => error.message })
       myself.status = code.aws_request_failed
     end
