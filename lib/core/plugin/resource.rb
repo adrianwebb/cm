@@ -17,6 +17,8 @@ class Resource < Nucleon.plugin_class(:nucleon, :base)
   # Plugin interface
 
   def normalize(reload)
+    ui.resource = "#{ui.resource}(#{Nucleon.green(id)})"
+
     super
 
     @plan = delete(:plan, nil) unless reload
@@ -104,14 +106,30 @@ class Resource < Nucleon.plugin_class(:nucleon, :base)
     @quit = quit
   end
 
+  #---
+
+  def start_time(reset = false)
+    @start_time = nil if reset
+    @start_time ||= Time.now.utc
+  end
+
+  #---
+
+  def end_time(reset = false)
+    @end_time = nil if reset
+    @end_time ||= Time.now.utc
+  end
+
   #-----------------------------------------------------------------------------
   # Operations
 
   def execute(operation)
+    start_time(true)
+
+    myself.status = code.success
+
     if initialized?
       method = "operation_#{operation}"
-
-      myself.status = code.success
 
       execute_functions
       interpolate_parameters
@@ -121,17 +139,21 @@ class Resource < Nucleon.plugin_class(:nucleon, :base)
         set_tokens(myself.data)
       end
     end
+    end_time(true)
     myself.status == code.success
   end
 
   #---
 
   def operation_deploy
-    info('cm.resource.info.run_internal', { :id => Nucleon.green(id), :op => 'deploy', :time => Nucleon.purple(Time.now.to_s) })
+    data = {}
+
+    info('cm.resource.info.run_internal', { :id => id, :op => 'deploy', :time => Nucleon.purple(Time.now.utc.strftime('%Y-%m-%d %H:%M:%S %Z')) })
+
     if retrieve_resource
-      data = update_resource
+      data = update_resource if myself.status == code.success
     else
-      data = create_resource
+      data = create_resource if myself.status == code.success
     end
     data
   end
@@ -139,7 +161,7 @@ class Resource < Nucleon.plugin_class(:nucleon, :base)
   #---
 
   def operation_destroy
-    info('cm.resource.info.run_internal', { :id => Nucleon.green(id), :op => 'destroy', :time => Nucleon.purple(Time.now.to_s) })
+    info('cm.resource.info.run_internal', { :id => id, :op => 'destroy', :time => Nucleon.purple(Time.now.utc.strftime('%Y-%m-%d %H:%M:%S %Z')) })
     delete_resource
   end
 
