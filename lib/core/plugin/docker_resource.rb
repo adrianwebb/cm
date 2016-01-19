@@ -74,7 +74,7 @@ class DockerResource < Nucleon.plugin_class(:CM, :resource)
   # Property accessors / modifiers
 
   def docker_id
-    @docker_id ||= "#{id}-#{Time.now.strftime('%Y-%m-%dT%H-%M-%S%z')}"
+    @docker_id ||= "#{id}-#{Time.now.strftime('%Y-%m-%dT%H-%M-%S%Z')}"
   end
 
   def image
@@ -160,12 +160,11 @@ class DockerResource < Nucleon.plugin_class(:CM, :resource)
         }))
         output_config.import(Nucleon::Config.ensure(data).export)
         output_config.save
-        Nucleon.remove_plugin(output_config)
       end
 
       logger.info("Docker internal data: #{hash(data)}")
     else
-      info('cm.resource.docker_resource.info.run_dockerized', { :image => Nucleon.yellow(image), :id => Nucleon.green(id), :op => operation, :time => Nucleon.purple(Time.now.to_s) })
+      info('cm.resource.docker_resource.info.run_dockerized', { :image => Nucleon.yellow(image), :id => id, :op => operation, :time => Nucleon.purple(Time.now.utc.strftime('%Y-%m-%d %H:%M:%S %Z')) })
       logger.info("Running #{operation} operation on #{plugin_provider} resource")
 
       data = action(plugin_provider, operation)
@@ -195,8 +194,9 @@ class DockerResource < Nucleon.plugin_class(:CM, :resource)
         :path => "#{host_output_directory}/config.json"
       }))
         data = Nucleon::Util::Data.clone(output_config.export)
-        Nucleon.remove_plugin(output_config)
       end
+    else
+      myself.status = code.docker_exec_failed
     end
     data
   ensure
@@ -298,7 +298,6 @@ class DockerResource < Nucleon.plugin_class(:CM, :resource)
     }))
     config.import({ :config => plan.manifest_config })
     config.save
-    Nucleon.remove_plugin(config)
 
     # Generate and store plan tokens in local input directory
     tokens = CM.configuration(extended_config(:container_input_token_data, {
@@ -307,7 +306,6 @@ class DockerResource < Nucleon.plugin_class(:CM, :resource)
     }))
     tokens.import(plan.tokens)
     tokens.save
-    Nucleon.remove_plugin(tokens)
 
     # Customize action settings
     action_settings[:resource_config] = myself.settings
