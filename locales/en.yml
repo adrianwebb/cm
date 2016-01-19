@@ -43,6 +43,27 @@ en:
           Creating AWS %{id} stack: %{name}
         delete_stack: |-
           Deleting AWS %{id} stack: %{name}
+      error:
+        fetch_keypair_failed: |-
+          Fetching AWS %{id} keypair %{name} failed with: %{message}
+        create_keypair_failed: |-
+          Creating AWS %{id} keypair %{name} failed with: %{message}
+        update_keypair_failed: |-
+          Updating AWS %{id} keypair %{name} failed with: %{message}
+        delete_keypair_failed: |-
+          Deleting AWS %{id} keypair %{name} failed with: %{message}
+        stack_failure: |-
+          AWS %{id} stack %{name} operation failed with: %{status}
+        fetch_stack_failed: |-
+          Fetching AWS %{id} stack %{name} failed with: %{message}
+        create_stack_failed: |-
+          Creating AWS %{id} stack %{name} failed with: %{message}
+        update_stack_failed: |-
+          Updating AWS %{id} stack %{name} failed with: %{message}
+        delete_stack_failed: |-
+          Deleting AWS %{id} stack %{name} failed with: %{message}
+        wait_stack_failed: |-
+          Waiting for AWS %{id} stack %{name} failed with: %{message}
   batch:
     celluloid:
       error:
@@ -109,3 +130,8 @@ en:
           info:
             start: |-
               Destroying cloud environment
+      resource:
+        run:
+          error:
+            resource_execution: |-
+              Resource %{id} %{operation} execution failed with: %{message}
