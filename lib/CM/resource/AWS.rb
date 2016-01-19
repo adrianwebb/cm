@@ -9,7 +9,14 @@ class AWS < Nucleon.plugin_class(:CM, :docker_resource)
   def normalize(reload)
     super
 
-    codes :aws_request_failed
+    codes :aws_request_failed, :stack_failed
+
+    settings[:tags] ||= {}
+    settings[:rollback] ||= true
+    settings[:notification_arns] ||= []
+    settings[:capabilities] ||= []
+
+    settings[:wait_retry_interval] ||= 5
 
     yield if block_given?
   end
@@ -31,7 +38,7 @@ class AWS < Nucleon.plugin_class(:CM, :docker_resource)
   #---
 
   def manifest_config
-    @manifest_config ||= plan.manifest_config
+    plan.manifest_config
   end
 
   #---
@@ -42,8 +49,18 @@ class AWS < Nucleon.plugin_class(:CM, :docker_resource)
 
   #---
 
+  def cf
+    @cf ||= init_cloud_formation
+  end
+
+  #---
+
   def key_file(name)
     File.join(plan.key_directory, "#{name}.pem")
+  end
+
+  def template_file(name)
+    File.join(plan.path, plugin_provider.to_s, "#{name}.template")
   end
 
   #-----------------------------------------------------------------------------
@@ -51,44 +68,45 @@ class AWS < Nucleon.plugin_class(:CM, :docker_resource)
 
   def create_resource
     super do |data|
-      if template == :keypair
+      case template
+      when :keypair
         create_keypair(parameters[:Name], data)
       else
-        #info('create_stack', { :id => id, :name => template, :prefix => false })
-        #create_stack(template, parameters, data)
+        create_stack(id, parameters, data)
       end
     end
   end
 
   def retrieve_resource
     resource = nil
-    if template == :keypair
+
+    case template
+    when :keypair
       resource = fetch_keypair(parameters[:Name])
     else
-      #resource = fetch_stack(template)
-      #dbg(resource, 'retrieval results')
+      resource = fetch_stack(id)
     end
     resource
   end
 
   def update_resource
     super do |data|
-      if template == :keypair
+      case template
+      when :keypair
         update_keypair(parameters[:Name], data)
       else
-        #info('update_stack', { :id => id, :name => template, :prefix => false })
-        #update_stack(template, parameters, data)
+        update_stack(id, parameters, data)
       end
     end
   end
 
   def delete_resource
     super do |data|
-      if template == :keypair
+      case template
+      when :keypair
         delete_keypair(parameters[:Name], data)
       else
-        #info('delete_stack', { :id => id, :name => template, :prefix => false })
-        #delete_stack(template, data)
+        delete_stack(id, data)
       end
     end
   end
@@ -112,8 +130,8 @@ class AWS < Nucleon.plugin_class(:CM, :docker_resource)
           }
         end
       rescue => error
-        # Placeholder for logging in the future
-        raise error
+        error('fetch_keypair_failed', { :id => id, :name => name, :message => error.message })
+        myself.status = code.aws_request_failed
       end
     end
     @keypair
@@ -135,8 +153,8 @@ class AWS < Nucleon.plugin_class(:CM, :docker_resource)
       data[:File] = aws_keypair[:file]
 
     rescue => error
+      error('create_keypair_failed', { :id => id, :name => name, :message => error.message })
       myself.status = code.aws_request_failed
-      raise error
     end
   end
 
@@ -166,8 +184,8 @@ class AWS < Nucleon.plugin_class(:CM, :docker_resource)
         create_keypair(name, data, true)
       end
     rescue => error
+      error('update_keypair_failed', { :id => id, :name => name, :message => error.message })
       myself.status = code.aws_request_failed
-      raise error
     end
   end
 
@@ -180,28 +198,194 @@ class AWS < Nucleon.plugin_class(:CM, :docker_resource)
         File.delete(aws_keypair[:file]) if File.exist?(aws_keypair[:file])
       end
     rescue => error
+      error('delete_keypair_failed', { :id => id, :name => name, :message => error.message })
       myself.status = code.aws_request_failed
-      raise error
     end
   end
 
   #-----------------------------------------------------------------------------
   # Stack related functionality
 
-  def fetch_stack(name, data)
+  def fetch_stack(name, reset = false)
+    if reset || !@stack
+      begin
+        result = cf.describe_stacks({ 'StackName' => name })
+        @stack = result.body['Stacks'].first
 
+      rescue Fog::AWS::CloudFormation::NotFound => error
+        @stack = nil
+      rescue => error
+        error('fetch_stack_failed', { :id => id, :name => name, :message => error.message })
+        myself.status = code.aws_request_failed
+      end
+    end
+    @stack
   end
 
-  def create_stack(name, parameters = {}, data)
+  def create_stack(name, parameters, data)
+    begin
+      info('create_stack', { :id => id, :name => template })
 
+      cf.create_stack(name, collect_stack_options(name, parameters, true))
+
+      if wait_for_stack(name, ( timeout / settings[:wait_retry_interval] ), settings[:wait_retry_interval])
+        collect_stack_data(name, data)
+      else
+        handle_stack_failure(name)
+      end
+
+    rescue => error
+      error('create_stack_failed', { :id => id, :name => name, :message => error.message })
+      myself.status = code.aws_request_failed
+    end
   end
 
   def update_stack(name, parameters = {}, data)
+    begin
+      info('update_stack', { :id => id, :name => template })
 
+      cf.update_stack(name, collect_stack_options(name, parameters, false))
+
+      if wait_for_stack(name, ( timeout / settings[:wait_retry_interval] ), settings[:wait_retry_interval])
+        collect_stack_data(name, data)
+      else
+        handle_stack_failure(name)
+      end
+
+    rescue => error
+      dbg(error.class, 'error class')
+      error('update_stack_failed', { :id => id, :name => name, :message => error.message })
+      myself.status = code.aws_request_failed
+    end
   end
 
   def delete_stack(name, data)
+    begin
+      info('delete_stack', { :id => id, :name => template })
 
+      cf.delete_stack(name)
+
+      unless wait_for_stack(name, ( timeout / settings[:wait_retry_interval] ), settings[:wait_retry_interval])
+        handle_stack_failure(name)
+      end
+
+    rescue => error
+      error('delete_stack_failed', { :id => id, :name => name, :message => error.message })
+      myself.status = code.aws_request_failed
+    end
+  end
+
+  #---
+
+  def wait_for_stack(name, tries = 100, interval = 5)
+    # Statuses current as of: 2016-01-18
+    # URL: http://docs.aws.amazon.com/AWSCloudFormation/latest/APIReference/API_Stack.html
+
+    success_statuses = [
+      'CREATE_COMPLETE',
+      'DELETE_COMPLETE',
+      'UPDATE_COMPLETE'
+    ]
+    failure_statuses = [
+      'CREATE_FAILED',
+      'ROLLBACK_FAILED',
+      'ROLLBACK_COMPLETE',
+      'DELETE_FAILED',
+      'UPDATE_ROLLBACK_FAILED',
+      'UPDATE_ROLLBACK_COMPLETE'
+    ]
+    in_progress_statuses = [
+      'CREATE_IN_PROGRESS',
+      'ROLLBACK_IN_PROGRESS',
+      'DELETE_IN_PROGRESS',
+      'UPDATE_IN_PROGRESS',
+      'UPDATE_COMPLETE_CLEANUP_IN_PROGRESS',
+      'UPDATE_ROLLBACK_IN_PROGRESS',
+      'UPDATE_ROLLBACK_COMPLETE_CLEANUP_IN_PROGRESS'
+    ]
+
+    next_token = nil
+    events = {}
+
+    (1..tries).each do |try|
+      begin
+        if stack = fetch_stack(name, true)
+          status = stack['StackStatus']
+
+          # Display listing of recent events
+          result = cf.describe_stack_events(name, Nucleon::Util::Data.clean({ 'NextToken' => next_token })).body
+          result['StackEvents'].sort {|a, b| a['Timestamp'] <=> b['Timestamp'] }.each do |event|
+            event_message = "#{event['Timestamp']} >>[#{event['ResourceType']}(#{event['PhysicalResourceId']})]: "\
+                            "#{event['ResourceStatus']}: #{event['ResourceStatusReason']}"
+            event_digest = Nucleon.sha1(event_message)
+
+            if event['Timestamp'] > start_time && !events.key?(event_digest)
+              info(event_message, { :i18n => false })
+              events[event_digest] = true
+            end
+            next_token = result['NextToken']
+          end
+          return true if success_statuses.include?(status)
+          return false if failure_statuses.include?(status)
+
+        else
+          # This should only be hit if we are deleting a stack
+          return true
+        end
+      rescue => error
+        error('wait_stack_failed', { :id => id, :name => name, :message => error.message })
+        myself.status = code.aws_request_failed
+      end
+      sleep interval
+    end
+    # We exhausted our tries waiting for a completion event :-(
+    false
+  end
+
+  #---
+
+  def collect_stack_options(name, parameters, create = true)
+    options = {
+      'Parameters' => parameters,
+      'Capabilities' => settings[:capabilities]
+    }
+    if create
+      options['Tags'] = settings[:tags]
+      options['TimeoutInMinutes'] = ( timeout / 60 )
+      options['DisableRollback'] = !settings[:rollback]
+      options['NotificationARNs'] = settings[:notification_arns]
+    end
+
+    template_file = template_file(template)
+
+    if File.exist?(template_file)
+      options['TemplateBody'] = Nucleon::Util::Disk.read(template_file)
+    elsif settings[:url]
+      options['TemplateURL'] = settings[:url]
+    else
+      raise 'AWS template JSON string or S3 URL required'
+    end
+    options
+  end
+
+  def collect_stack_data(name, data)
+    stack = fetch_stack(name)
+
+    data[:StackId] = stack['StackId']
+    data[:StackStatus] = stack['StackStatus']
+    data[:StackCreationTime] = stack['CreationTime']
+    data[:StackCapabilities] = stack['Capabilities']
+    data[:StackDisabledRollback] = stack['DisableRollback']
+
+    stack['Outputs'].each do |output|
+      data[output['OutputKey'].to_sym] = output['OutputValue']
+    end
+  end
+
+  def handle_stack_failure(name)
+    stack = fetch_stack(name)
+    error('stack_failure', { :id => id, :name => name, :status => stack['StackStatus'] })
+    myself.status = code.stack_failed
   end
 
   #-----------------------------------------------------------------------------
@@ -217,6 +401,20 @@ class AWS < Nucleon.plugin_class(:CM, :docker_resource)
       :aws_secret_access_key => manifest_config[:aws][:SecretAccessKey]
     })
   end
+  protected :init_compute
+
+  #---
+
+  def init_cloud_formation
+    require 'fog/aws'
+
+    Fog::AWS::CloudFormation.new({
+      :region => manifest_config[:aws][:Region],
+      :aws_access_key_id => manifest_config[:aws][:AccessKey],
+      :aws_secret_access_key => manifest_config[:aws][:SecretAccessKey]
+    })
+  end
+  protected :init_cloud_formation
 end
 end
 end
