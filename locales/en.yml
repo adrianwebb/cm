@@ -40,7 +40,9 @@ en:
         create_stack: |-
           Creating AWS %{id} stack: %{name}
         update_stack: |-
-          Creating AWS %{id} stack: %{name}
+          Updating AWS %{id} stack: %{name}
+        update_stack_updated: |-
+          AWS %{id} stack %{name} up to date: %{message}
         delete_stack: |-
           Deleting AWS %{id} stack: %{name}
       error:
