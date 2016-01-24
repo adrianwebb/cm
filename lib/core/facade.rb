@@ -12,6 +12,16 @@ module Facade
   #-----------------------------------------------------------------------------
   # Core plugin type facade
 
+  def package(name, options = {}, provider = nil)
+    Nucleon.plugin(:CM, :package, provider, Nucleon::Config.ensure(options).import({ :name => name }))
+  end
+
+  def packages(data, build_hash = false, keep_array = false)
+    Nucleon.plugins(:CM, :package, data, build_hash, keep_array)
+  end
+
+  #---
+
   def plan(name, options = {}, provider = nil)
     Nucleon.plugin(:CM, :plan, provider, Nucleon::Config.ensure(options).import({ :name => name }))
   end
