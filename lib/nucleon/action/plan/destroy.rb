@@ -20,12 +20,6 @@ class Destroy < Nucleon.plugin_class(:nucleon, :plan_action)
     end
   end
 
-  #---
-
-  def arguments
-    [:manifest]
-  end
-
   #-----------------------------------------------------------------------------
   # Action operations
 
