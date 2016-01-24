@@ -13,6 +13,10 @@ class Resource < Nucleon.plugin_class(:nucleon, :base)
     # Override if needed
   end
 
+  def self.project_directory?
+    false
+  end
+
   #-----------------------------------------------------------------------------
   # Plugin interface
 
