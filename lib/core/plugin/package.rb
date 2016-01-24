@@ -133,7 +133,7 @@ class Package < Nucleon.plugin_class(:CM, :disk_configuration)
 
   #---
 
-  def install
+  def install(cm_file)
     success = true
     myself.status = code.success
 
@@ -154,7 +154,7 @@ class Package < Nucleon.plugin_class(:CM, :disk_configuration)
 
   #---
 
-  def use
+  def use(cm_file = nil)
     success = true
     myself.status = code.success
 
@@ -181,7 +181,7 @@ class Package < Nucleon.plugin_class(:CM, :disk_configuration)
 
   #---
 
-  def release
+  def release(cm_file)
     success = true
     myself.status = code.success
 

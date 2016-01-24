@@ -89,7 +89,7 @@ class Default < Nucleon.plugin_class(:CM, :package)
 
   #---
 
-  def install
+  def install(cm_file)
     super do |success|
       info('install', { :name => plugin_name, :type => plugin_provider, :path => path })
       true
@@ -98,7 +98,7 @@ class Default < Nucleon.plugin_class(:CM, :package)
 
   #---
 
-  def use
+  def use(cm_file = nil)
     super do |success|
       info('use', { :name => plugin_name, :type => plugin_provider, :path => path })
       true
@@ -107,7 +107,7 @@ class Default < Nucleon.plugin_class(:CM, :package)
 
   #---
 
-  def release
+  def release(cm_file)
     super do |success|
       info('release', { :name => plugin_name, :type => plugin_provider, :path => path })
       true
