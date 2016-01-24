@@ -33,6 +33,7 @@ class PackageAction < Nucleon.plugin_class(:nucleon, :cm_action)
         'cm.action.package.base.errors.package_provider'
       ]
       register_str :name, nil, 'cm.action.package.base.options.name'
+      register_str :root_path, File.join(ENV['HOME'], 'CM'), 'cm.action.package.base.options.root_path'
 
       # Loading additional registered package plugin options
       Nucleon.loaded_plugins(:CM, :package).each do |provider, data|
@@ -53,7 +54,7 @@ class PackageAction < Nucleon.plugin_class(:nucleon, :cm_action)
   # Properties
 
   def package_directory
-    "#{ENV['HOME']}/.cm/#{settings[:name]}"
+    File.join(settings[:root_path], settings[:name])
   end
 
   def package
