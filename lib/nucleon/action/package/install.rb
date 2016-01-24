@@ -16,8 +16,12 @@ class Install < Nucleon.plugin_class(:nucleon, :package_action)
 
   def configure
     super do
-
+      register_file :cm_file, nil
     end
+  end
+
+  def arguments
+    [ super, :cm_file ].flatten
   end
 
   #-----------------------------------------------------------------------------
@@ -26,7 +30,7 @@ class Install < Nucleon.plugin_class(:nucleon, :package_action)
   def execute
     super do
       info('start')
-      unless package.install
+      unless package.install(settings[:cm_file])
         myself.status = package.status
       end
     end

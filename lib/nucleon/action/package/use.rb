@@ -16,8 +16,12 @@ class Use < Nucleon.plugin_class(:nucleon, :package_action)
 
   def configure
     super do
-
+      register_str :cm_file, 'NA'
     end
+  end
+
+  def arguments
+    [ super, :cm_file ].flatten
   end
 
   #-----------------------------------------------------------------------------
@@ -26,7 +30,7 @@ class Use < Nucleon.plugin_class(:nucleon, :package_action)
   def execute
     super do
       info('start')
-      unless package.use
+      unless package.use((settings[:cm_file] == 'NA' ? nil : settings[:cm_file]))
         myself.status = package.status
       end
     end

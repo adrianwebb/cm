@@ -16,8 +16,12 @@ class Release < Nucleon.plugin_class(:nucleon, :package_action)
 
   def configure
     super do
-
+      register_str :cm_file, "#{plugin_name}-#{Time.now.strftime('%Y-%m-%dT%H-%M-%S%Z')}.cm"
     end
+  end
+
+  def arguments
+    [ super, :cm_file ].flatten
   end
 
   #-----------------------------------------------------------------------------
@@ -26,7 +30,7 @@ class Release < Nucleon.plugin_class(:nucleon, :package_action)
   def execute
     super do
       info('start')
-      unless package.release
+      unless package.release(settings[:cm_file])
         myself.status = package.status
       end
     end
