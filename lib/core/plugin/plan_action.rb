@@ -7,8 +7,6 @@ module Nucleon
 module Plugin
 class PlanAction < Nucleon.plugin_class(:nucleon, :cm_action)
 
-  include Mixin::Action::Project
-
   #-----------------------------------------------------------------------------
   # Constuctor / Destructor
 
@@ -78,7 +76,7 @@ class PlanAction < Nucleon.plugin_class(:nucleon, :cm_action)
       ]
 
       # Loading additional registered resource plugin options
-      Nucleon.loaded_plugins(:CM, :resource).each do |resource, data|
+      Nucleon.loaded_plugins(:CM, :resource).each do |provider, data|
         data[:class].options(myself)
       end
 
