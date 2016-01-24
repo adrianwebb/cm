@@ -2,13 +2,13 @@
 module Nucleon
 module Action
 module Package
-class Delete < Nucleon.plugin_class(:nucleon, :package_action)
+class Remove < Nucleon.plugin_class(:nucleon, :package_action)
 
   #-----------------------------------------------------------------------------
   # Info
 
   def self.describe
-    super(:package, :delete, 1001)
+    super(:package, :remove, 1001)
   end
 
   #-----------------------------------------------------------------------------
@@ -26,7 +26,7 @@ class Delete < Nucleon.plugin_class(:nucleon, :package_action)
   def execute
     super do
       info('start')
-      unless package.delete
+      unless package.remove
         myself.status = package.status
       end
     end
