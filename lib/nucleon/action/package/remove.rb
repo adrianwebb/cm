@@ -8,7 +8,7 @@ class Remove < Nucleon.plugin_class(:nucleon, :package_action)
   # Info
 
   def self.describe
-    super(:package, :remove, 1001)
+    super(:package, :remove, 1000)
   end
 
   #-----------------------------------------------------------------------------

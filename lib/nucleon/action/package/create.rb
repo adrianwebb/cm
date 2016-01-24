@@ -8,7 +8,7 @@ class Create < Nucleon.plugin_class(:nucleon, :package_action)
   # Info
 
   def self.describe
-    super(:package, :create, 1001)
+    super(:package, :create, 1005)
   end
 
   #-----------------------------------------------------------------------------

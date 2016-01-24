@@ -8,7 +8,7 @@ class Install < Nucleon.plugin_class(:nucleon, :package_action)
   # Info
 
   def self.describe
-    super(:package, :install, 1000)
+    super(:package, :install, 1004)
   end
 
   #-----------------------------------------------------------------------------

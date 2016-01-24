@@ -8,7 +8,7 @@ class Use < Nucleon.plugin_class(:nucleon, :package_action)
   # Info
 
   def self.describe
-    super(:package, :use, 999)
+    super(:package, :use, 1002)
   end
 
   #-----------------------------------------------------------------------------

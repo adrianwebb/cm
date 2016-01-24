@@ -8,7 +8,7 @@ class Release < Nucleon.plugin_class(:nucleon, :package_action)
   # Info
 
   def self.describe
-    super(:package, :release, 998)
+    super(:package, :release, 1001)
   end
 
   #-----------------------------------------------------------------------------
