@@ -3,6 +3,10 @@ module CM
 module Resource
 class AWS < Nucleon.plugin_class(:CM, :docker_resource)
 
+  def self.project_directory?
+    true
+  end
+
   #-----------------------------------------------------------------------------
   # Plugin interface
 
@@ -60,7 +64,7 @@ class AWS < Nucleon.plugin_class(:CM, :docker_resource)
   end
 
   def template_file(name)
-    File.join(plan.path, plugin_provider.to_s, "#{name}.template")
+    File.join(plan.path, plugin_provider.to_s, "#{name}.json")
   end
 
   #-----------------------------------------------------------------------------
