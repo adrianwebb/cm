@@ -7,6 +7,30 @@ module Registration
   #-----------------------------------------------------------------------------
   # Registration definitions
 
+  def register_package_provider(name, default = nil, locale = nil, &code)
+    register_plugin_provider(:CM, :package, name.to_sym, default, locale, &code)
+  end
+
+  #---
+
+  def register_package_providers(name, default = nil, locale = nil, &code)
+    register_plugin_providers(:CM, :package, name.to_sym, default, locale, &code)
+  end
+
+  #---
+
+  def register_package(name, default = nil, locale = nil, &code)
+    register_plugin(:CM, :package, name.to_sym, default, locale, &code)
+  end
+
+  #---
+
+  def register_packages(name, default = nil, locale = nil, &code)
+    register_plugins(:CM, :package, name.to_sym, default, locale, &code)
+  end
+
+  #---
+
   def register_plan_provider(name, default = nil, locale = nil, &code)
     register_plugin_provider(:CM, :plan, name.to_sym, default, locale, &code)
   end
