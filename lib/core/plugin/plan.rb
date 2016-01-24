@@ -12,7 +12,7 @@ class Plan < Nucleon.plugin_class(:CM, :disk_configuration)
   #---
 
   def self.register_ids
-    [ :directory, :revision ]
+    [ :path ]
   end
 
   #-----------------------------------------------------------------------------
