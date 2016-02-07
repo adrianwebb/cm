@@ -13,4 +13,3 @@ COPY . /opt/cm/core
 WORKDIR /opt/cm/core/bootstrap
 
 RUN /bin/bash -c "./bootstrap.sh base git svn ruby cm"
-RUN /bin/bash -c "./bootstrap.sh test"
